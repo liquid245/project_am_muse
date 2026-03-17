@@ -4,6 +4,9 @@
 **Разработчик:** Georgy  
 **Цель:** запустить за 1–2 вечера, минимум кода, только кнопки, один репозиторий, 0 руб/мес.
 
+https://www.pythonanywhere.com/user/liquid245/consoles/45822775/
+https://github.com/liquid245/project_am_muse
+
 ### 1. Структура репозитория (один репозиторий — brooch-catalog)
 
 ```text
