@@ -1,1 +1,209 @@
-/* Custom styles can be added here */
+/* Using CSS Custom Properties as requested for easy theme management */
+:root {
+    --transition-curve: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --transition-duration: 0.4s;
+}
+
+/* Gallery Slides */
+.gallery-slide {
+    transition: opacity var(--transition-duration) var(--transition-curve);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.gallery-slide.active {
+    opacity: 1;
+    z-index: 2;
+    position: relative;
+}
+
+.gallery-container {
+    height: 17rem; /* h-64 */
+}
+
+
+/* Navigation Arrows */
+.nav-arrow {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transform: translateY(-50%); /* Center vertically */
+
+    /* Apple Style Glassmorphism */
+    background: rgba(0, 0, 0, 0.25);
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    
+    transition: all var(--transition-duration) var(--transition-curve);
+    opacity: 0; /* Hidden by default */
+}
+
+.gallery-container:hover .nav-arrow {
+    opacity: 1;
+}
+
+.nav-arrow:hover {
+    background: rgba(0, 0, 0, 0.5);
+    transform: translateY(-50%) scale(1.1); /* Combine transforms */
+}
+
+/* Nudge arrows for better visual centering */
+.nav-arrow.left .gallery-arrow-svg {
+    transform: translateX(-1px);
+}
+.nav-arrow.right .gallery-arrow-svg {
+    transform: translateX(1px);
+}
+
+
+/* Dot Indicators */
+.dot-indicators {
+    z-index: 3;
+    opacity: 0; /* Hidden by default */
+    transition: opacity var(--transition-duration) var(--transition-curve);
+}
+
+.gallery-container:hover .dot-indicators {
+    opacity: 1;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all var(--transition-duration) var(--transition-curve);
+}
+
+.dot.active {
+    background-color: rgba(255, 255, 255, 1);
+    transform: scale(1.2);
+}
+
+/* Fullscreen Overlay Styles */
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.fullscreen-overlay .fullscreen-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fullscreen-overlay img {
+    /* This rule is now overridden by the more specific one below */
+    object-fit: contain;
+}
+
+.fullscreen-overlay .gallery-container {
+    width: 100%;
+    height: 100%;
+}
+
+.fullscreen-overlay .gallery-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.fullscreen-close-button {
+    position: absolute;
+    top: 2vh;
+    right: 2vw;
+    cursor: pointer;
+    z-index: 1002; /* Above cloned gallery */
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.25);
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: all var(--transition-duration) var(--transition-curve);
+}
+.fullscreen-close-button:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+/* Re-position the controls when in fullscreen */
+.fullscreen-overlay .nav-arrow {
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.fullscreen-overlay .nav-arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+.fullscreen-overlay .nav-arrow.left { left: 2vw; }
+.fullscreen-overlay .nav-arrow.right { right: 2vw; }
+
+.fullscreen-overlay .dot-indicators {
+    position: absolute;
+    bottom: 2vh;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 1;
+}
+
+/* Autoplay Progress Bar */
+.autoplay-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.gallery-container.is-autoplaying .autoplay-progress {
+    opacity: 1;
+}
+
+.autoplay-progress-bar {
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
+    width: 0;
+}
+
+.gallery-container.is-autoplaying .autoplay-progress-bar {
+    animation: fillProgressBar 6s linear forwards;
+}
+
+@keyframes fillProgressBar {
+    from { width: 0%; }
+    to { width: 100%; }
+}

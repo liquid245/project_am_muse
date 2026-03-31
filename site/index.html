@@ -1,39 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM Muse</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'milk': '#FAF5EC',
-              'peach': '#FAD2B8',
-              'icy-blue': '#D5E0EC',
-              'slate-blue': '#A0B2C7',
-              'dark-navy': '#2F3E5D',
-            }
-          }
-        }
-      }
-    </script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="bg-milk">
-    <header class="container mx-auto py-8 text-center">
-        <img src="assets/logo.jpeg" alt="AM Muse Logo" class="mx-auto h-32">
-    </header>
-    <main class="container mx-auto">
-        <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Product cards will be injected here by JavaScript -->
-        </div>
-    </main>
-    <footer class="text-center py-4 mt-8">
-        <p class="text-slate-blue">&copy; 2026 AM Muse. Все права защищены.</p>
-    </footer>
-    <script src="script.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AM Muse</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bad+Script&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            milk: "#FAF5EC",
+                            peach: "#FAD2B8",
+                            "icy-blue": "#D5E0EC",
+                            "slate-blue": "#A0B2C7",
+                            "dark-navy": "#2F3E5D",
+                        },
+                        fontFamily: {
+                            display: ["Bad Script", "cursive"],
+                        },
+                    },
+                },
+            };
+        </script>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="bg-milk">
+        <header class="container mx-auto py-8 px-4">
+            <div class="grid grid-cols-3 items-center">
+                <div
+                    class="font-display text-dark-navy text-5xl text-right pr-4"
+                >
+                    Магазин брошек
+                </div>
+                <img
+                    src="assets/logo_scaled.jpeg"
+                    alt="AM Muse Logo"
+                    class="h-32 rounded-lg mx-auto"
+                />
+                <div class="font-display text-dark-navy text-5xl text-left pl-4">
+                    Анастасии Мухортовой
+                </div>
+            </div>
+        </header>
+        <main class="container mx-auto px-4">
+            <div
+                id="product-grid"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+                <!-- Product cards will be injected here by JavaScript -->
+            </div>
+        </main>
+        <footer class="text-center py-4 mt-8">
+            <p class="text-slate-blue">
+                &copy; 2026 AM Muse. Все права защищены.
+            </p>
+        </footer>
+        <script src="script.js"></script>
+    </body>
 </html>
