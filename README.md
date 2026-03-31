@@ -97,3 +97,9 @@ project_am_muse/
 - Состояние гонки предотвращено на уровне бота.
 - Статус и stock управляются в едином catalog.json через GitHub API.
 - Сайт читает один catalog.json и имеет предупреждение о задержке кэша.
+
+---
+
+### GitHub Pages
+
+Вы можете просмотреть сайт здесь: https://liquid245.github.io/project_am_muse/
