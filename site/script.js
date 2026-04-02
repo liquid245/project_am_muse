@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('../catalog/catalog.json')
+    fetch('catalog/catalog.json')
         .then(response => response.json())
         .then(data => {
             const productGrid = document.getElementById('product-grid');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 const gallerySlides = item.images.map((image, index) => `
                     <div class="gallery-slide ${index === 0 ? 'active' : ''}">
-                        <img src="../catalog/images/${image}" alt="${item.title} - Photo ${index + 1}" class="w-full h-full object-cover cursor-pointer">
+                        <img src="catalog/images/${image}" alt="${item.title} - Photo ${index + 1}" class="w-full h-full object-cover cursor-pointer">
                     </div>
                 `).join('');
 

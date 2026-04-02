@@ -1,1 +1,12 @@
+# Environment variables
 .env
+bot/.env
+
+# Python virtual environment
+bot/.venv/
+
+# macOS system files
+.DS_Store
+
+# Build artifacts
+site/catalog/
