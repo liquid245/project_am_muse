@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 const contentDiv = document.createElement('div');
-                contentDiv.className = 'p-6 flex flex-col h-full';
+                contentDiv.className = 'p-6 flex flex-col overflow-y-auto';
 
                 const title = document.createElement('h3');
                 title.className = 'text-xl font-bold text-dark-navy mb-2';
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 contentDiv.appendChild(description);
 
                 const footerDiv = document.createElement('div');
-                footerDiv.className = 'flex justify-between items-center';
+                footerDiv.className = 'flex justify-between items-center flex-shrink-0';
 
                 const price = document.createElement('span');
                 price.className = 'text-2xl font-bold text-dark-navy';
@@ -69,6 +69,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     button.textContent = 'Продано';
                 } else {
                     button.textContent = 'Заказать';
+                    button.addEventListener('click', () => {
+                        const botUsername = 'project_am_muse_bot'; // Actual bot username
+                        const payload = `order_${item.id}`;
+                        const botDeepLink = `https://t.me/${botUsername}?start=${payload}`;
+                        window.open(botDeepLink, '_blank');
+                    });
                 }
                 footerDiv.appendChild(button);
                 

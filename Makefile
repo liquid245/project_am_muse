@@ -29,19 +29,21 @@ run-bot:
 	bot/.venv/bin/python3 -m dotenv -f bot/.env run bot/.venv/bin/python3 bot/bot.py
 
 # Run the static site server
-run-site: pre-run-site
+run-site:
 	@echo "🌐 Starting static site server on http://localhost:8000..."
 	python3 -m http.server --directory docs 8000
-
-# Prepare site for running
-pre-run-site:
-	@echo "Copying catalog to docs directory..."
-	@cp -r catalog docs/
 
 # Run both bot and site in parallel
 run:
 	@echo "🚀 Starting all services in parallel..."
-	@make run-bot & make run-site
+	@bash -c ' \
+		python3 -m http.server --directory docs 8000 & PIDS="$!"; \
+		bot/.venv/bin/python3 -m dotenv -f bot/.env run bot/.venv/bin/python3 bot/bot.py & PIDS="$! $PIDS"; \
+		\
+		echo "Started PIDS: $PIDS" ; \
+		trap "kill $PIDS" SIGINT ; \
+		wait \
+	'
 
 # Clean up generated files
 clean:
