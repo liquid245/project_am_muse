@@ -10,6 +10,7 @@ from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from github import Github
+from github.GithubException import UnknownObjectException
 
 # Load environment variables from .env file
 # Configure logging
@@ -254,13 +255,23 @@ async def update_catalog_data(new_data):
     """Updates the catalog data on the GitHub repository."""
     try:
         repo = g.get_repo(REPO_NAME)
-        contents = repo.get_contents("catalog/catalog.json")
-        repo.update_file(
-            contents.path,
-            "Update catalog",
-            json.dumps(new_data, indent=2, ensure_ascii=False),
-            contents.sha,
-        )
+        file_path = "catalog/catalog.json"
+        try:
+            contents = repo.get_contents(file_path)
+            # If file exists, update it
+            repo.update_file(
+                contents.path,
+                "Update catalog",
+                json.dumps(new_data, indent=2, ensure_ascii=False),
+                contents.sha,
+            )
+        except UnknownObjectException:
+            # If file does not exist, create it
+            repo.create_file(
+                file_path,
+                "Create catalog",
+                json.dumps(new_data, indent=2, ensure_ascii=False),
+            )
         return True
     except Exception as e:
         logging.error(f"Error updating catalog on GitHub: {e}")
@@ -273,6 +284,9 @@ async def get_orders_data():
         contents = repo.get_contents("data/orders.json")
         orders_data = json.loads(contents.decoded_content.decode())
         return orders_data
+    except UnknownObjectException:
+        # If the file doesn't exist, return a default empty structure
+        return {"orders": []}
     except Exception as e:
         logging.error(f"Error getting orders from GitHub: {e}")
         # If the file doesn't exist, return a default structure
@@ -282,13 +296,23 @@ async def update_orders_data(new_data):
     """Updates the orders data on the GitHub repository."""
     try:
         repo = g.get_repo(REPO_NAME)
-        contents = repo.get_contents("data/orders.json")
-        repo.update_file(
-            contents.path,
-            "Update orders",
-            json.dumps(new_data, indent=2, ensure_ascii=False),
-            contents.sha,
-        )
+        file_path = "data/orders.json"
+        try:
+            contents = repo.get_contents(file_path)
+            # If file exists, update it
+            repo.update_file(
+                contents.path,
+                "Update orders",
+                json.dumps(new_data, indent=2, ensure_ascii=False),
+                contents.sha,
+            )
+        except UnknownObjectException:
+            # If file does not exist, create it
+            repo.create_file(
+                file_path,
+                "Create orders",
+                json.dumps(new_data, indent=2, ensure_ascii=False),
+            )
         return True
     except Exception as e:
         logging.error(f"Error updating orders on GitHub: {e}")
@@ -301,6 +325,9 @@ async def get_catalog_data():
         contents = repo.get_contents("catalog/catalog.json")
         catalog_data = json.loads(contents.decoded_content.decode())
         return catalog_data
+    except UnknownObjectException:
+        # If the file doesn't exist, return a default empty structure
+        return {"items": []}
     except Exception as e:
         logging.error(f"Error getting catalog from GitHub: {e}")
         return None
@@ -315,8 +342,13 @@ async def show_catalog(message: types.Message):
     if catalog_data is None:
         await message.answer("Ошибка получения каталога с GitHub.")
         return
+    
+    logging.info(f"Full catalog data: {catalog_data}")
+    logging.info(f"Items before filtering: {catalog_data.get('items', [])}")
         
     available_items = [item for item in catalog_data["items"] if item.get("stock", 0) > 0 and item.get("status") == "available"]
+
+    logging.info(f"Filtered available items: {available_items}")
 
     if not available_items:
         await message.answer("В данный момент доступных товаров нет.")

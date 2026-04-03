@@ -23,19 +23,32 @@
                             "dark-navy": "#2F3E5D",
                         },
                         fontFamily: {
-                            display: ["Bad Script", "cursive"],
+                            display: [
+                                "Good Vibes Pro",
+                                "Bad Script",
+                                "cursive",
+                            ],
                         },
                     },
                 },
             };
         </script>
+        <style>
+            @font-face {
+                font-family: "Good Vibes Pro";
+                src: url("assets/ofont.ru_Good Vibes Pro.ttf")
+                    format("truetype");
+                font-weight: normal;
+                font-style: normal;
+            }
+        </style>
         <link rel="stylesheet" href="style.css" />
     </head>
     <body class="bg-milk">
         <header class="container mx-auto py-8 px-4">
             <div class="grid grid-cols-3 items-center">
                 <div
-                    class="font-display text-dark-navy text-5xl text-right pr-4"
+                    class="font-display text-dark-navy text-right pr-4 site-header-text-left whitespace-nowrap"
                 >
                     Магазин брошек
                 </div>
@@ -44,8 +57,10 @@
                     alt="AM Muse Logo"
                     class="h-32 rounded-lg mx-auto"
                 />
-                <div class="font-display text-dark-navy text-5xl text-left pl-4">
-                    Анастасии Мухортовой
+                <div
+                    class="font-display text-dark-navy text-left pl-4 site-header-text-right whitespace-nowrap"
+                >
+                    Анастасии М.
                 </div>
             </div>
         </header>

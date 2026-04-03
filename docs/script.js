@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             data.items.forEach(item => {
                 const cardWrapper = document.createElement('div');
-                cardWrapper.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out";
+                cardWrapper.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col h-full";
 
                 const galleryContainer = document.createElement('div');
                 galleryContainer.className = 'gallery-container relative';
@@ -94,6 +94,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('product-grid').innerHTML = '<p class="text-center text-red-500">Не удалось загрузить товары.</p>';
             }
         });
+
+    // Adjust header font size on load and resize
+    adjustHeaderFontSize();
+    window.addEventListener('resize', adjustHeaderFontSize);
 });
 
 function initGallery(galleryNode, options = {}) {
@@ -196,7 +200,7 @@ function initGallery(galleryNode, options = {}) {
 
     leftArrow.addEventListener('click', (e) => { e.stopPropagation(); handleInteraction(); showSlide((currentIndex - 1 + slides.length) % slides.length); });
     rightArrow.addEventListener('click', (e) => { e.stopPropagation(); handleInteraction(); showSlide((currentIndex + 1) % slides.length); });
-    dots.forEach(dot => dot.addEventListener('click', (e) => { e.stopPropagation(); handleInteraction(); showSlide(parseInt(e.currentTarget.dataset.slideIndex)); }));
+    dots.forEach(dot => dot.addEventListener('click', (e) => { e.stopPropagation(); handleInteraction(); showSlide(parseInt(e.currentTarget.dataset.slide-index)); }));
 
     if (!isFullscreen) {
         galleryNode.addEventListener('mouseenter', () => {
@@ -213,4 +217,116 @@ function initGallery(galleryNode, options = {}) {
 
 function initAllGalleries() {
     document.querySelectorAll('.gallery-container').forEach(gallery => initGallery(gallery));
+}
+
+// Helper to measure text width
+const measureTextWidth = (text, font) => {
+    const canvas = measureTextWidth.canvas || (measureTextWidth.canvas = document.createElement('canvas'));
+    const context = canvas.getContext('2d');
+    context.font = font;
+    const metrics = context.measureText(text);
+    return metrics.width;
+};
+
+// Function to adjust header font size dynamically
+function adjustHeaderFontSize() {
+    const leftHeader = document.querySelector('.site-header-text-left');
+    const rightHeader = document.querySelector('.site-header-text-right');
+    const logo = document.querySelector('header img');
+    const headerGrid = document.querySelector('header .grid');
+
+    if (!leftHeader || !rightHeader || !logo || !headerGrid) {
+        console.warn("Could not find all header elements for font adjustment.");
+        return;
+    }
+
+    const MIN_PADDING = 5; // Minimum padding in pixels
+    const MAX_FONT_SIZE = 50; // Max font size in pixels, matching original text-5xl
+
+    // Ensure logo has loaded to get accurate width
+    if (logo.naturalWidth === 0) {
+        logo.onload = adjustHeaderFontSize;
+        return;
+    }
+
+    const logoWidth = logo.offsetWidth;
+    const gridWidth = headerGrid.offsetWidth;
+
+    // Calculate available width for each text element
+    // grid is 3 columns. Each text div is 1 column. Logo is 1 column.
+    // Assuming equal column distribution, each column is gridWidth / 3.
+    // However, Tailwind's grid might not distribute equally if content is too large.
+    // Let's calculate based on actual space available for text.
+    // The total width for the two text blocks and the logo is `gridWidth`.
+    // The logo occupies its `logoWidth`. The remaining width is `gridWidth - logoWidth`.
+    // This remaining width is shared by the two text blocks.
+    // We also have `pr-4` (padding-right: 1rem = 16px) and `pl-4` (padding-left: 1rem = 16px) on the text divs.
+    // And implicit padding of 5px from screen edge.
+    // The grid also has `px-4` on the header, meaning 16px padding on each side of the container.
+    // So, the actual available width for the *whole grid content* is `gridWidth - (16px * 2)`.
+
+    // A simpler approach: get the bounding client rect of the text containers themselves.
+    const leftHeaderRect = leftHeader.getBoundingClientRect();
+    const rightHeaderRect = rightHeader.getBoundingClientRect();
+
+    // Calculate max available width for left text (up to logo, minus padding)
+    // and for right text (from logo to end, minus padding).
+    // The left header has `pr-4` (16px). The right header has `pl-4` (16px).
+    // The space between text and logo:
+    // Left text right edge + pr-4 to logo left edge - (logo's implicit gap)
+    // Let's assume the grid structure implies that the available space for `leftHeader`
+    // is `logo.getBoundingClientRect().left - leftHeaderRect.left - MIN_PADDING`.
+    // And for `rightHeader` is `rightHeaderRect.right - logo.getBoundingClientRect().right - MIN_PADDING`.
+    // This is problematic with `pr-4` and `pl-4` on the text divs themselves.
+
+    // Let's simplify and consider the *total* available horizontal space for the text divs,
+    // assuming they are roughly 1/3 of the container each in a 3-column grid.
+    // The actual "padding" comes from `pr-4` and `pl-4` and `mx-auto` on the header.
+
+    // A more direct way: the "grid grid-cols-3 items-center" suggests 3 columns.
+    // If the logo is in the middle column, and the text divs are in the first and third.
+    // We can assume each text div is roughly `(gridWidth - logoWidth) / 2` in ideal scenario.
+
+    // Let's try to get the actual column widths if possible.
+    // Or, calculate based on the bounding box of the whole header container.
+
+    const headerContainer = document.querySelector('header.container');
+    const headerContainerRect = headerContainer.getBoundingClientRect();
+
+    // Available width for left text: from left edge of headerContainer to left edge of logo, minus MIN_PADDING
+    // and minus its own right padding (pr-4 = 16px)
+    const availableWidthLeft = logo.getBoundingClientRect().left - headerContainerRect.left - MIN_PADDING - 16;
+    // Available width for right text: from right edge of logo to right edge of headerContainer, minus MIN_PADDING
+    // and minus its own left padding (pl-4 = 16px)
+    const availableWidthRight = headerContainerRect.right - logo.getBoundingClientRect().right - MIN_PADDING - 16;
+
+    let currentFontSize = MAX_FONT_SIZE;
+    const step = 1; // Decrement by 1px each time
+
+    // Adjust left header
+    let leftText = leftHeader.textContent.trim();
+    while (currentFontSize > 10) { // Don't go below a reasonable minimum
+        leftHeader.style.fontSize = `${currentFontSize}px`;
+        const currentFont = window.getComputedStyle(leftHeader).font;
+        const textWidth = measureTextWidth(leftText, currentFont);
+        if (textWidth <= availableWidthLeft) {
+            break;
+        }
+        currentFontSize -= step;
+    }
+    leftHeader.style.fontSize = `${currentFontSize}px`;
+
+    // Adjust right header
+    currentFontSize = MAX_FONT_SIZE; // Reset for the right header
+    let rightText = rightHeader.textContent.trim();
+    while (currentFontSize > 10) {
+        rightHeader.style.fontSize = `${currentFontSize}px`;
+        const currentFont = window.getComputedStyle(rightHeader).font;
+        const textWidth = measureTextWidth(rightText, currentFont);
+        if (textWidth <= availableWidthRight) {
+            break;
+        }
+        currentFontSize -= step;
+    }
+    rightHeader.style.fontSize = `${currentFontSize}px`;
 }
