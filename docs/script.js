@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 contentDiv.appendChild(title);
 
                 const description = document.createElement('p');
-                description.className = 'text-slate-blue mb-4 flex-grow';
+                description.className = 'text-slate-blue mb-4 flex-grow product-description';
                 description.textContent = item.description;
                 contentDiv.appendChild(description);
 

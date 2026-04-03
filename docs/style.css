@@ -207,3 +207,29 @@
     from { width: 0%; }
     to { width: 100%; }
 }
+
+/* Mobile-specific styles for product cards */
+@media (max-width: 767px) {
+    /* Hide description */
+    .product-description {
+        display: none;
+    }
+
+    /* Smaller title text */
+    /* Target h3 within the product card's content div for specificity */
+    .bg-white > div.p-6 > h3.text-xl {
+        font-size: 1rem; /* Equivalent to text-base */
+        margin-bottom: 0.25rem; /* Equivalent to mb-1 */
+    }
+
+    /* Smaller price text */
+    /* Target span within the footer div of the product card for specificity */
+    .bg-white > div.p-6 > div.flex.justify-between.items-center.flex-shrink-0 > span.text-2xl {
+        font-size: 1.25rem; /* Equivalent to text-xl */
+    }
+    
+    /* Adjust padding of the content div */
+    .bg-white > div.p-6 {
+        padding: 0.75rem; /* Equivalent to p-3 */
+    }
+}
