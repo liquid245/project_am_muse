@@ -9,4 +9,4 @@ bot/.venv/
 .DS_Store
 
 # Build artifacts
-site/catalog/
+docs/catalog/

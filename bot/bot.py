@@ -22,6 +22,9 @@ ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
 MANAGER_USER_ID = os.getenv("MANAGER_USER_ID")
 REPO_NAME = os.getenv("REPO_NAME")
 
+ORDER_CHAT_ID = int(os.getenv("ORDER_CHAT_ID")) if os.getenv("ORDER_CHAT_ID") else None
+ORDER_TOPIC_ID = int(os.getenv("ORDER_TOPIC_ID")) if os.getenv("ORDER_TOPIC_ID") else None
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Initialize bot and dispatcher
@@ -57,6 +60,7 @@ async def send_welcome(message: types.Message):
             [types.KeyboardButton(text="🛍 Каталог")],
             [types.KeyboardButton(text="💬 Написать менеджеру")],
             [types.KeyboardButton(text="Показать ID пользователя")],
+            [types.KeyboardButton(text="Показать ID чата")],
         ],
         resize_keyboard=True,
     )
@@ -70,6 +74,7 @@ async def send_welcome(message: types.Message):
                 [types.KeyboardButton(text="🛍 Каталог")],
                 [types.KeyboardButton(text="💬 Написать менеджеру")],
                 [types.KeyboardButton(text="Показать ID пользователя")],
+                [types.KeyboardButton(text="Показать ID чата")],
             ],
             resize_keyboard=True,
         )
@@ -80,6 +85,29 @@ async def send_welcome(message: types.Message):
 @dp.message(lambda message: message.text == "Показать ID пользователя")
 async def show_user_id(message: types.Message):
     await message.answer(f"Ваш ID пользователя: {message.from_user.id}")
+
+
+async def get_chat_id_text(message: types.Message) -> str:
+    chat_id = message.chat.id
+    text = f"ID этого чата: {chat_id}"
+    if message.is_topic_message and message.message_thread_id:
+        topic_id = message.message_thread_id
+        text += f"\nID этой темы: {topic_id}"
+    return text
+
+@dp.message(Command("chatid"))
+async def show_chat_id_command(message: types.Message):
+    """
+    This handler will be called when user sends `/chatid` command
+    """
+    await message.answer(await get_chat_id_text(message))
+
+@dp.message(lambda message: message.text == "Показать ID чата")
+async def show_chat_id_button(message: types.Message):
+    """
+    This handler will be called when user clicks on the "Показать ID чата" button
+    """
+    await message.answer(await get_chat_id_text(message))
 
 
 @dp.message(lambda message: message.text == "💬 Написать менеджеру")
@@ -389,6 +417,8 @@ async def process_address(message: types.Message, state: FSMContext):
             # Notify admin and manager
             await bot.send_message(ADMIN_USER_ID, f"Новый заказ: {new_order_id}")
             await bot.send_message(MANAGER_USER_ID, f"Новый заказ: {new_order_id}")
+            if ORDER_CHAT_ID and ORDER_TOPIC_ID:
+                await bot.send_message(ORDER_CHAT_ID, f"Новый заказ: {new_order_id}", message_thread_id=ORDER_TOPIC_ID)
         else:
             await message.answer("Ошибка создания заказа на GitHub.")
 

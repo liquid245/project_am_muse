@@ -11,40 +11,72 @@ document.addEventListener('DOMContentLoaded', function () {
             data.items.forEach(item => {
                 const cardWrapper = document.createElement('div');
                 cardWrapper.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out";
-                
-                const gallerySlides = item.images.map((image, index) => `
-                    <div class="gallery-slide ${index === 0 ? 'active' : ''}">
-                        <img src="catalog/images/${image}" alt="${item.title} - Photo ${index + 1}" class="w-full h-full object-cover cursor-pointer">
-                    </div>
-                `).join('');
 
-                const dotIndicators = item.images.map((_, index) => `
-                    <div class="dot ${index === 0 ? 'active' : ''}" data-slide-index="${index}"></div>
-                `).join('');
+                const galleryContainer = document.createElement('div');
+                galleryContainer.className = 'gallery-container relative';
 
-                const showControls = item.images.length > 1;
+                item.images.forEach((image, index) => {
+                    const slide = document.createElement('div');
+                    slide.className = `gallery-slide ${index === 0 ? 'active' : ''}`;
+                    const img = document.createElement('img');
+                    img.src = `catalog/images/${image}`;
+                    img.alt = `${item.title} - Photo ${index + 1}`;
+                    img.className = 'w-full h-full object-cover cursor-pointer';
+                    slide.appendChild(img);
+                    galleryContainer.appendChild(slide);
+                });
 
-                cardWrapper.innerHTML = `
-                    <div class="gallery-container relative">
-                        ${gallerySlides}
-                        ${showControls ? `
+                if (item.images.length > 1) {
+                    const controlsHTML = `
                         <div class="nav-arrow left absolute top-1/2 left-2 cursor-pointer p-2"><svg class="gallery-arrow-svg" width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 2L3 10L10 18" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div>
                         <div class="nav-arrow right absolute top-1/2 right-2 cursor-pointer p-2"><svg class="gallery-arrow-svg" width="12" height="20" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L9 10L2 18" stroke="white" stroke-width="3" stroke-linecap="round"/></svg></div>
-                        <div class="dot-indicators absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2">${dotIndicators}</div>
+                        <div class="dot-indicators absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2">${
+                            item.images.map((_, index) => `<div class="dot ${index === 0 ? 'active' : ''}" data-slide-index="${index}"></div>`).join('')
+                        }</div>
                         <div class="autoplay-progress"><div class="autoplay-progress-bar"></div></div>
-                        ` : ''}
-                    </div>
-                    <div class="p-6 flex flex-col h-full">
-                        <h3 class="text-xl font-bold text-dark-navy mb-2">${item.title}</h3>
-                        <p class="text-slate-blue mb-4 flex-grow">${item.description}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-dark-navy">${item.price} ₽</span>
-                            <button class="bg-dark-navy text-white py-2 px-4 rounded-full hover:bg-peach transition-colors duration-300 ${item.status === 'sold' ? 'opacity-50 cursor-not-allowed' : ''}" ${item.status === 'sold' ? 'disabled' : ''}>
-                                ${item.status === 'available' ? 'Заказать' : item.status === 'sold' ? 'Продано' : 'Заказать'}
-                            </button>
-                        </div>
-                    </div>
-                `;
+                    `;
+                    const template = document.createElement('template');
+                    template.innerHTML = controlsHTML;
+                    galleryContainer.append(...template.content.children);
+                }
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-6 flex flex-col h-full';
+
+                const title = document.createElement('h3');
+                title.className = 'text-xl font-bold text-dark-navy mb-2';
+                title.textContent = item.title;
+                contentDiv.appendChild(title);
+
+                const description = document.createElement('p');
+                description.className = 'text-slate-blue mb-4 flex-grow';
+                description.textContent = item.description;
+                contentDiv.appendChild(description);
+
+                const footerDiv = document.createElement('div');
+                footerDiv.className = 'flex justify-between items-center';
+
+                const price = document.createElement('span');
+                price.className = 'text-2xl font-bold text-dark-navy';
+                price.textContent = `${item.price} ₽`;
+                footerDiv.appendChild(price);
+
+                const button = document.createElement('button');
+                button.className = `bg-dark-navy text-white py-2 px-4 rounded-full hover:bg-peach transition-colors duration-300`;
+                if (item.status === 'sold') {
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                    button.disabled = true;
+                    button.textContent = 'Продано';
+                } else {
+                    button.textContent = 'Заказать';
+                }
+                footerDiv.appendChild(button);
+                
+                contentDiv.appendChild(footerDiv);
+
+                cardWrapper.appendChild(galleryContainer);
+                cardWrapper.appendChild(contentDiv);
+
                 productGrid.appendChild(cardWrapper);
             });
             

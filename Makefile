@@ -31,12 +31,12 @@ run-bot:
 # Run the static site server
 run-site: pre-run-site
 	@echo "🌐 Starting static site server on http://localhost:8000..."
-	python3 -m http.server --directory site 8000
+	python3 -m http.server --directory docs 8000
 
 # Prepare site for running
 pre-run-site:
-	@echo "Copying catalog to site directory..."
-	@cp -r catalog site/
+	@echo "Copying catalog to docs directory..."
+	@cp -r catalog docs/
 
 # Run both bot and site in parallel
 run:
@@ -47,5 +47,5 @@ run:
 clean:
 	@echo "🧹 Cleaning up..."
 	rm -rf bot/.venv
-	rm -rf site/catalog
+	rm -rf docs/catalog
 	@echo "✅ Cleanup complete."
