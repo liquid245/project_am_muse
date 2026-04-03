@@ -8,6 +8,15 @@
       "item_title": "Брошь 'Морской бриз'",
       "quantity": 1,
       "order_date": "2026-03-20"
+    },
+    {
+      "order_id": "order-0002",
+      "user_id": 182961001,
+      "user_name": "123",
+      "item_id": "brooch-0002",
+      "item_title": "Брошь 'Лесной дух'",
+      "quantity": 1,
+      "order_date": "2026-04-03"
     }
   ]
 }
