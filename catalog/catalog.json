@@ -9,18 +9,22 @@
       "status": "available",
       "created_at": "2026-03-17",
       "updated_at": "2026-03-17",
-      "images": ["photo_2026-03-17 20.38.22.jpeg"]
+      "images": [
+        "photo_2026-03-17 20.38.22.jpeg"
+      ]
     },
     {
       "id": "brooch-0002",
       "title": "Брошь 'Лесной дух'",
       "description": "Эксклюзивная брошь с натуральными камнями.",
       "price": 2500,
-      "stock": 1,
-      "status": "available",
+      "stock": 0,
+      "status": "sold",
       "created_at": "2026-03-18",
       "updated_at": "2026-03-18",
-      "images": ["photo_2026-03-17 20.38.26.jpeg"]
+      "images": [
+        "photo_2026-03-17 20.38.26.jpeg"
+      ]
     }
   ]
 }
