@@ -3,12 +3,14 @@ import logging
 import os
 import json
 import datetime
+import uuid
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from github import Github
 
 
 
@@ -29,12 +31,36 @@ dp = Dispatcher()
 lock = asyncio.Lock()
 CATALOG_FILE = "docs/catalog/catalog.json"
 
+def get_cancel_keyboard():
+    keyboard = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [types.InlineKeyboardButton(text="Прервать добавление товара", callback_data="cancel_add_item")]
+        ]
+    )
+    return keyboard
+
+def get_save_and_cancel_keyboard():
+    keyboard = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [types.InlineKeyboardButton(text="Сохранить", callback_data="save_item")],
+            [types.InlineKeyboardButton(text="Прервать добавление товара", callback_data="cancel_add_item")]
+        ]
+    )
+    return keyboard
+
+@dp.callback_query(lambda c: c.data == "cancel_add_item")
+async def cancel_add_item(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback_query.message.answer("Добавление товара прервано.", reply_markup=types.ReplyKeyboardRemove())
+    await callback_query.answer()
+
 class Form(StatesGroup):
     title = State()
     description = State()
     price = State()
     stock = State()
-    images = State()
+    waiting_for_images = State()  # New state to collect multiple images
+    process_images = State()      # New state to process collected images
 
 class OrderForm(StatesGroup):
     name = State()
@@ -80,7 +106,8 @@ async def send_welcome(message: types.Message):
 async def show_user_chat_topic_id(message: types.Message):
     user_id_text = f"Ваш ID пользователя: {message.from_user.id}"
     chat_topic_text = await get_chat_id_text(message)
-    await message.answer(f"{user_id_text}\n{chat_topic_text}")
+    await message.answer(f"{user_id_text}
+{chat_topic_text}")
 
 
 async def get_chat_id_text(message: types.Message) -> str:
@@ -88,7 +115,8 @@ async def get_chat_id_text(message: types.Message) -> str:
     text = f"ID этого чата: {chat_id}"
     if message.is_topic_message and message.message_thread_id:
         topic_id = message.message_thread_id
-        text += f"\nID этой темы: {topic_id}"
+        text += f"
+ID этой темы: {topic_id}"
     return text
 
 
@@ -143,13 +171,13 @@ async def add_item(message: types.Message, state: FSMContext):
 async def process_title(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
     await state.set_state(Form.description)
-    await message.answer("Введите описание товара:")
+    await message.answer("Введите описание товара:", reply_markup=get_cancel_keyboard())
 
 @dp.message(Form.description)
 async def process_description(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
     await state.set_state(Form.price)
-    await message.answer("Введите цену товара:")
+    await message.answer("Введите цену товара:", reply_markup=get_cancel_keyboard())
 
 @dp.message(Form.price)
 async def process_price(message: types.Message, state: FSMContext):
@@ -158,26 +186,78 @@ async def process_price(message: types.Message, state: FSMContext):
         return
     await state.update_data(price=int(message.text))
     await state.set_state(Form.stock)
-    await message.answer("Введите количество товара на складе:")
+    await message.answer("Введите количество товара на складе:", reply_markup=get_cancel_keyboard())
 
 @dp.message(Form.stock)
 async def process_stock(message: types.Message, state: FSMContext):
     if not message.text.isdigit():
         await message.answer("Пожалуйста, введите число.")
         return
-    await state.update_data(stock=int(message.text))
-    await state.set_state(Form.images)
-    await message.answer("Отправьте имя файла изображения (например, photo.jpg):")
+    await state.update_data(stock=int(message.text), temp_image_file_ids=[]) # Initialize list for image file_ids
+    await state.set_state(Form.waiting_for_images)
+    await message.answer("Отправьте одно или несколько изображений для товара. Используйте кнопку 'Прервать добавление товара' если хотите отменить. После добавления хотя бы одного фото появится кнопка 'Сохранить'.", reply_markup=get_cancel_keyboard())
 
-@dp.message(Form.images)
-async def process_images(message: types.Message, state: FSMContext):
-    await state.update_data(images=[message.text])
+
+
+@dp.message(Form.waiting_for_images)
+async def process_waiting_for_images(message: types.Message, state: FSMContext):
+    if message.photo:
+        file_id = message.photo[-1].file_id  # Get the largest photo
+        async with lock: # Ensure thread-safe operations for state data
+            data = await state.get_data()
+            image_file_ids = data.get('temp_image_file_ids', [])
+            image_file_ids.append(file_id)
+            await state.update_data(temp_image_file_ids=image_file_ids)
+            
+            # Send message with save and cancel buttons
+            await message.answer("Изображение получено. Отправьте еще, нажмите 'Сохранить' для завершения, или 'Прервать добавление товара'.", reply_markup=get_save_and_cancel_keyboard())
+    else:
+        # If no photo, but text, check for '/done' (though it should be handled by the button now)
+        # Or if just text, prompt again for an image
+        await message.answer("Пожалуйста, отправьте изображение, нажмите 'Сохранить' для завершения, или 'Прервать добавление товара'.", reply_markup=get_save_and_cancel_keyboard())
+
+
+@dp.callback_query(lambda c: c.data == "save_item")
+async def save_item_callback(callback_query: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    if not data.get('temp_image_file_ids'):
+        await callback_query.answer("Пожалуйста, сначала отправьте хотя бы одно изображение.", show_alert=True)
+        return
+    await state.set_state(Form.process_images)
+    await process_new_item(callback_query.message, state)
+    await callback_query.answer()
+
+
+async def process_new_item(message: types.Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
 
+    # Create the images directory if it doesn't exist
+    images_dir = "docs/catalog/images"
+    os.makedirs(images_dir, exist_ok=True)
+    
+    saved_image_names = []
+    for file_id in data["temp_image_file_ids"]:
+        try:
+            file_info = await bot.get_file(file_id)
+            downloaded_file_path = file_info.file_path
+            
+            # Generate a unique filename using UUID
+            # import uuid - uuid imported at top
+            unique_filename = f"{uuid.uuid4().hex}.jpeg" # Assuming jpeg, but can be dynamic
+            destination_path = os.path.join(images_dir, unique_filename)
+            
+            await bot.download_file(downloaded_file_path, destination_path)
+            saved_image_names.append(unique_filename)
+            logging.info(f"Image saved to {destination_path}")
+        except Exception as e:
+            logging.error(f"Error saving image {file_id}: {e}")
+            await message.answer(f"Ошибка при сохранении изображения: {e}")
+            # Decide whether to continue or abort if an image fails to save
+
     catalog_data = await get_catalog_data()
     if catalog_data is None:
-        await message.answer("Ошибка получения каталога.") # Changed from GitHub error
+        await message.answer("Ошибка получения каталога.")
         return
 
     new_id_num = len(catalog_data["items"]) + 1
@@ -194,26 +274,68 @@ async def process_images(message: types.Message, state: FSMContext):
         "status": "available",
         "created_at": today,
         "updated_at": today,
-        "images": data["images"]
+        "images": saved_image_names # Use the list of saved image names
     }
 
     catalog_data["items"].append(new_item)
 
     if await update_catalog_data(catalog_data):
         await message.answer("Товар добавлен!")
+        user_id = str(message.from_user.id)
+        if user_id == ADMIN_USER_ID:
+            admin_keyboard = types.ReplyKeyboardMarkup(
+                keyboard=[
+                    [types.KeyboardButton(text="Добавить товар")],
+                    [types.KeyboardButton(text="Список товаров")],
+                    [types.KeyboardButton(text="Активные заказы")],
+                    [types.KeyboardButton(text="🛍 Каталог")],
+                    [types.KeyboardButton(text="💬 Написать менеджеру")],
+                    [types.KeyboardButton(text="Показать ID пользователя, чата и темы")],
+                ],
+                resize_keyboard=True,
+            )
+            await message.answer("Готово. Вы можете продолжить работу.", reply_markup=admin_keyboard)
     else:
-        await message.answer("Ошибка добавления товара.") # Changed from GitHub error
+        await message.answer("Ошибка добавления товара.")
 
 async def update_catalog_data(new_data):
-    """Updates the catalog data on the local filesystem."""
+    """Updates the catalog data on the local filesystem and optionally on GitHub."""
+    # 1. Update local catalog.json
     try:
         os.makedirs(os.path.dirname(CATALOG_FILE), exist_ok=True)
         with open(CATALOG_FILE, "w", encoding="utf-8") as f:
             json.dump(new_data, f, indent=2, ensure_ascii=False)
-        return True
+        logging.info("Local catalog.json updated successfully.")
     except Exception as e:
-        logging.error(f"Error updating catalog locally: {e}")
+        logging.error(f"Error updating local catalog.json: {e}")
         return False
+
+    # 2. Optionally update catalog.json on GitHub
+    if GITHUB_TOKEN and REPO_NAME:
+        try:
+            g = Github(GITHUB_TOKEN)
+            # Assuming REPO_NAME is in format "owner/repo"
+            repo = g.get_repo(REPO_NAME)
+            
+            contents = repo.get_contents(CATALOG_FILE)
+            
+            # Encode new_data to JSON string
+            new_content_str = json.dumps(new_data, indent=2, ensure_ascii=False)
+            
+            repo.update_file(
+                path=CATALOG_FILE,
+                message="Update catalog.json via bot",
+                content=new_content_str,
+                sha=contents.sha
+            )
+            logging.info(f"catalog.json updated successfully on GitHub in repository {REPO_NAME}.")
+            return True
+        except Exception as e:
+            logging.error(f"Error updating catalog.json on GitHub: {e}")
+            return False
+    else:
+        logging.info("GitHub token or repository name not provided. Skipping GitHub update.")
+        return True # Local update was successful, so return True
 
 async def get_catalog_data():
     """Gets and parses the catalog data from the local filesystem."""
@@ -257,7 +379,6 @@ async def show_catalog(message: types.Message):
         return
 
     for item in available_items:
-        image_path = f"docs/catalog/images/{item['images'][0]}" # Adjusted path for local file
         caption = f"""{item['title']}
 
 {item['description']}
@@ -268,11 +389,26 @@ async def show_catalog(message: types.Message):
                 [types.InlineKeyboardButton(text="Заказать этот товар", callback_data=f"order_{item['id']}")]
             ]
         )
-        try:
-            photo = types.FSInputFile(image_path)
-            await message.answer_photo(photo=photo, caption=caption, reply_markup=keyboard)
-        except FileNotFoundError:
-            await message.answer(f"Изображение для '{item['title']}' не найдено.")
+        
+        # Send all images for the item
+        if item.get('images'):
+            media_group = []
+            for img_name in item['images']:
+                image_path = f"docs/catalog/images/{img_name}"
+                if os.path.exists(image_path):
+                    media_group.append(types.InputMediaPhoto(media=types.FSInputFile(image_path)))
+                else:
+                    logging.warning(f"Image file not found: {image_path}")
+            
+            if media_group:
+                # Add caption to the first photo in the media group
+                media_group[0].caption = caption
+                await message.answer_media_group(media=media_group)
+                await message.answer(" ", reply_markup=keyboard) # Send keyboard separately if using media group
+            else:
+                await message.answer(f"Изображения для '{item['title']}' не найдены.", reply_markup=keyboard)
+        else:
+            await message.answer(f"Изображения для '{item['title']}' не найдены.", reply_markup=keyboard)
 
 
 @dp.callback_query(lambda c: c.data and c.data.startswith('order_'))
@@ -506,5 +642,4 @@ async def cancel_delete(callback_query: types.CallbackQuery):
 async def main():
     await dp.start_polling(bot)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+

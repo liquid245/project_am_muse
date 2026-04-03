@@ -117,6 +117,20 @@
       "images": [
         null
       ]
+    },
+    {
+      "id": "brooch-0009",
+      "title": "111",
+      "description": "222",
+      "price": 333,
+      "stock": 444,
+      "status": "available",
+      "created_at": "2026-04-03",
+      "updated_at": "2026-04-03",
+      "images": [
+        "7c2f4f4e8c8140699b0f3e2324c962d9.jpeg",
+        "173a583809984b0d969d8218fb49d455.jpeg"
+      ]
     }
   ]
 }
