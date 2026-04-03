@@ -49,5 +49,4 @@ run:
 clean:
 	@echo "🧹 Cleaning up..."
 	rm -rf bot/.venv
-	rm -rf docs/catalog
 	@echo "✅ Cleanup complete."

@@ -9,8 +9,8 @@ from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from github import Github
-from github.GithubException import UnknownObjectException
+
+
 
 # Load environment variables from .env file
 # Configure logging
@@ -18,21 +18,16 @@ logging.basicConfig(level=logging.INFO)
 
 # Environment variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
-MANAGER_USER_ID = os.getenv("MANAGER_USER_ID")
-REPO_NAME = os.getenv("REPO_NAME")
 
-ORDER_CHAT_ID = int(os.getenv("ORDER_CHAT_ID")) if os.getenv("ORDER_CHAT_ID") else None
-ORDER_TOPIC_ID = int(os.getenv("ORDER_TOPIC_ID")) if os.getenv("ORDER_TOPIC_ID") else None
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+ORDER_CHAT_ID = -1003497103344  # User provided chat ID
+ORDER_TOPIC_ID = 43            # User provided topic ID
 
 # Initialize bot and dispatcher
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-g = Github(GITHUB_TOKEN)
 lock = asyncio.Lock()
+CATALOG_FILE = "docs/catalog/catalog.json"
 
 class Form(StatesGroup):
     title = State()
@@ -60,8 +55,7 @@ async def send_welcome(message: types.Message):
         keyboard=[
             [types.KeyboardButton(text="🛍 Каталог")],
             [types.KeyboardButton(text="💬 Написать менеджеру")],
-            [types.KeyboardButton(text="Показать ID пользователя")],
-            [types.KeyboardButton(text="Показать ID чата")],
+            [types.KeyboardButton(text="Показать ID пользователя, чата и темы")],
         ],
         resize_keyboard=True,
     )
@@ -74,8 +68,7 @@ async def send_welcome(message: types.Message):
                 [types.KeyboardButton(text="Активные заказы")],
                 [types.KeyboardButton(text="🛍 Каталог")],
                 [types.KeyboardButton(text="💬 Написать менеджеру")],
-                [types.KeyboardButton(text="Показать ID пользователя")],
-                [types.KeyboardButton(text="Показать ID чата")],
+                [types.KeyboardButton(text="Показать ID пользователя, чата и темы")],
             ],
             resize_keyboard=True,
         )
@@ -83,9 +76,11 @@ async def send_welcome(message: types.Message):
     else:
         await message.reply("Hi! I'm Project AM Muse Bot. Ready to work!", reply_markup=keyboard)
 
-@dp.message(lambda message: message.text == "Показать ID пользователя")
-async def show_user_id(message: types.Message):
-    await message.answer(f"Ваш ID пользователя: {message.from_user.id}")
+@dp.message(lambda message: message.text == "Показать ID пользователя, чата и темы")
+async def show_user_chat_topic_id(message: types.Message):
+    user_id_text = f"Ваш ID пользователя: {message.from_user.id}"
+    chat_topic_text = await get_chat_id_text(message)
+    await message.answer(f"{user_id_text}\n{chat_topic_text}")
 
 
 async def get_chat_id_text(message: types.Message) -> str:
@@ -96,19 +91,9 @@ async def get_chat_id_text(message: types.Message) -> str:
         text += f"\nID этой темы: {topic_id}"
     return text
 
-@dp.message(Command("chatid"))
-async def show_chat_id_command(message: types.Message):
-    """
-    This handler will be called when user sends `/chatid` command
-    """
-    await message.answer(await get_chat_id_text(message))
 
-@dp.message(lambda message: message.text == "Показать ID чата")
-async def show_chat_id_button(message: types.Message):
-    """
-    This handler will be called when user clicks on the "Показать ID чата" button
-    """
-    await message.answer(await get_chat_id_text(message))
+
+
 
 
 @dp.message(lambda message: message.text == "💬 Написать менеджеру")
@@ -120,10 +105,29 @@ async def write_to_manager(message: types.Message, state: FSMContext):
 @dp.message(WriteToManager.message_to_manager)
 async def forward_message_to_manager(message: types.Message, state: FSMContext):
     user_info = f"Сообщение от {message.from_user.full_name} (ID: {message.from_user.id}):"
-    await bot.send_message(MANAGER_USER_ID, user_info)
-    await bot.forward_message(MANAGER_USER_ID, from_chat_id=message.chat.id, message_id=message.message_id)
-    await message.answer("Ваше сообщение отправлено менеджеру.")
-    await state.clear()
+    
+    # Forward the user's message to the specified chat and topic
+    try:
+        # Send user info as a separate message first
+        await bot.send_message(
+            chat_id=ORDER_CHAT_ID,
+            message_thread_id=ORDER_TOPIC_ID,
+            text=user_info
+        )
+        # Then forward the actual message for direct reply
+        await bot.forward_message(
+            chat_id=ORDER_CHAT_ID,
+            message_thread_id=ORDER_TOPIC_ID,
+            from_chat_id=message.chat.id,
+            message_id=message.message_id
+        )
+        logging.info(f"Message from user {message.from_user.id} forwarded to chat {ORDER_CHAT_ID}, topic {ORDER_TOPIC_ID}")
+        await message.answer("Ваше сообщение отправлено менеджеру.")
+    except Exception as e:
+        logging.error(f"Error forwarding message to manager chat: {e}")
+        await message.answer("Произошла ошибка при отправке вашего сообщения менеджеру.")
+    finally:
+        await state.clear()
 
 
 
@@ -173,7 +177,7 @@ async def process_images(message: types.Message, state: FSMContext):
 
     catalog_data = await get_catalog_data()
     if catalog_data is None:
-        await message.answer("Ошибка получения каталога с GitHub.")
+        await message.answer("Ошибка получения каталога.") # Changed from GitHub error
         return
 
     new_id_num = len(catalog_data["items"]) + 1
@@ -198,139 +202,37 @@ async def process_images(message: types.Message, state: FSMContext):
     if await update_catalog_data(catalog_data):
         await message.answer("Товар добавлен!")
     else:
-        await message.answer("Ошибка добавления товара на GitHub.")
-
-
-
-@dp.message(lambda message: message.text == "Список товаров")
-async def list_items(message: types.Message):
-    """
-    This handler will be called when user clicks on the "Список товаров" button
-    """
-    catalog_data = await get_catalog_data()
-    if catalog_data is None:
-        await message.answer("Ошибка получения каталога с GitHub.")
-        return
-        
-    if not catalog_data["items"]:
-        await message.answer("Каталог пуст.")
-        return
-
-    for item in catalog_data["items"]:
-        text = f"{item['title']} - {item['price']} руб."
-        keyboard = types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    types.InlineKeyboardButton(text="Edit", callback_data=f"edit_{item['id']}"),
-                    types.InlineKeyboardButton(text="Delete", callback_data=f"delete_{item['id']}")
-                ]
-            ]
-        )
-        await message.answer(text, reply_markup=keyboard)
-
-
-
-@dp.message(lambda message: message.text == "Активные заказы")
-async def active_orders(message: types.Message):
-    """
-    This handler will be called when user clicks on the "Активные заказы" button
-    """
-    orders_data = await get_orders_data()
-    if orders_data is None:
-        await message.answer("Ошибка получения заказов с GitHub.")
-        return
-
-    if not orders_data["orders"]:
-        await message.answer("Активных заказов нет.")
-        return
-
-    for order in orders_data["orders"]:
-        text = f"""Заказ: {order['order_id']}
-Покупатель: {order['user_name']}
-Товар: {order['item_title']}
-Дата: {order['order_date']}"""
-        await message.answer(text)
+        await message.answer("Ошибка добавления товара.") # Changed from GitHub error
 
 async def update_catalog_data(new_data):
-    """Updates the catalog data on the GitHub repository."""
+    """Updates the catalog data on the local filesystem."""
     try:
-        repo = g.get_repo(REPO_NAME)
-        file_path = "catalog/catalog.json"
-        try:
-            contents = repo.get_contents(file_path)
-            # If file exists, update it
-            repo.update_file(
-                contents.path,
-                "Update catalog",
-                json.dumps(new_data, indent=2, ensure_ascii=False),
-                contents.sha,
-            )
-        except UnknownObjectException:
-            # If file does not exist, create it
-            repo.create_file(
-                file_path,
-                "Create catalog",
-                json.dumps(new_data, indent=2, ensure_ascii=False),
-            )
+        os.makedirs(os.path.dirname(CATALOG_FILE), exist_ok=True)
+        with open(CATALOG_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_data, f, indent=2, ensure_ascii=False)
         return True
     except Exception as e:
-        logging.error(f"Error updating catalog on GitHub: {e}")
-        return False
-
-async def get_orders_data():
-    """Gets and parses the orders data from the GitHub repository."""
-    try:
-        repo = g.get_repo(REPO_NAME)
-        contents = repo.get_contents("data/orders.json")
-        orders_data = json.loads(contents.decoded_content.decode())
-        return orders_data
-    except UnknownObjectException:
-        # If the file doesn't exist, return a default empty structure
-        return {"orders": []}
-    except Exception as e:
-        logging.error(f"Error getting orders from GitHub: {e}")
-        # If the file doesn't exist, return a default structure
-        return {"orders": []}
-
-async def update_orders_data(new_data):
-    """Updates the orders data on the GitHub repository."""
-    try:
-        repo = g.get_repo(REPO_NAME)
-        file_path = "data/orders.json"
-        try:
-            contents = repo.get_contents(file_path)
-            # If file exists, update it
-            repo.update_file(
-                contents.path,
-                "Update orders",
-                json.dumps(new_data, indent=2, ensure_ascii=False),
-                contents.sha,
-            )
-        except UnknownObjectException:
-            # If file does not exist, create it
-            repo.create_file(
-                file_path,
-                "Create orders",
-                json.dumps(new_data, indent=2, ensure_ascii=False),
-            )
-        return True
-    except Exception as e:
-        logging.error(f"Error updating orders on GitHub: {e}")
+        logging.error(f"Error updating catalog locally: {e}")
         return False
 
 async def get_catalog_data():
-    """Gets and parses the catalog data from the GitHub repository."""
+    """Gets and parses the catalog data from the local filesystem."""
     try:
-        repo = g.get_repo(REPO_NAME)
-        contents = repo.get_contents("catalog/catalog.json")
-        catalog_data = json.loads(contents.decoded_content.decode())
+        with open(CATALOG_FILE, "r", encoding="utf-8") as f:
+            catalog_data = json.load(f)
         return catalog_data
-    except UnknownObjectException:
-        # If the file doesn't exist, return a default empty structure
+    except FileNotFoundError:
         return {"items": []}
-    except Exception as e:
-        logging.error(f"Error getting catalog from GitHub: {e}")
+    except json.JSONDecodeError as e:
+        logging.error(f"Error decoding catalog.json: {e}")
         return None
+    except Exception as e:
+        logging.error(f"Error getting catalog locally: {e}")
+        return None
+
+
+
+
 
 @dp.message(lambda message: message.text == "🛍 Каталог")
 async def show_catalog(message: types.Message):
@@ -340,7 +242,7 @@ async def show_catalog(message: types.Message):
     catalog_data = await get_catalog_data()
 
     if catalog_data is None:
-        await message.answer("Ошибка получения каталога с GitHub.")
+        await message.answer("Ошибка получения каталога.")
         return
     
     logging.info(f"Full catalog data: {catalog_data}")
@@ -355,7 +257,7 @@ async def show_catalog(message: types.Message):
         return
 
     for item in available_items:
-        image_path = f"catalog/images/{item['images'][0]}"
+        image_path = f"docs/catalog/images/{item['images'][0]}" # Adjusted path for local file
         caption = f"""{item['title']}
 
 {item['description']}
@@ -363,7 +265,7 @@ async def show_catalog(message: types.Message):
 Цена: {item['price']} руб."""
         keyboard = types.InlineKeyboardMarkup(
             inline_keyboard=[
-                [types.InlineKeyboardButton(text="Заказать эту брошь", callback_data=f"order_{item['id']}")]
+                [types.InlineKeyboardButton(text="Заказать этот товар", callback_data=f"order_{item['id']}")]
             ]
         )
         try:
@@ -371,6 +273,7 @@ async def show_catalog(message: types.Message):
             await message.answer_photo(photo=photo, caption=caption, reply_markup=keyboard)
         except FileNotFoundError:
             await message.answer(f"Изображение для '{item['title']}' не найдено.")
+
 
 @dp.callback_query(lambda c: c.data and c.data.startswith('order_'))
 async def process_order(callback_query: types.CallbackQuery, state: FSMContext):
@@ -394,30 +297,26 @@ async def process_phone(message: types.Message, state: FSMContext):
 
 @dp.message(OrderForm.address)
 async def process_address(message: types.Message, state: FSMContext):
-    await state.update_data(address=message.text)
     data = await state.get_data()
     await state.clear()
 
     async with lock:
-        orders_data = await get_orders_data()
-        if orders_data is None:
-            await message.answer("Ошибка получения заказов с GitHub.")
-            return
-
         catalog_data = await get_catalog_data()
         if catalog_data is None:
-            await message.answer("Ошибка получения каталога с GitHub.")
+            await message.answer("Ошибка получения каталога.")
             return
             
         item_id = data["item_id"]
         logging.info(f"Processing order for item_id: {item_id}")
         item_title = ""
+        item_price = 0
         item_in_stock = False
         for item in catalog_data["items"]:
             if item["id"] == item_id:
                 logging.info(f"Found item in catalog. Stock: {item.get('stock')}")
                 if item["stock"] > 0:
                     item_title = item["title"]
+                    item_price = item["price"]
                     item["stock"] -= 1
                     if item["stock"] == 0:
                         item["status"] = "sold"
@@ -428,31 +327,69 @@ async def process_address(message: types.Message, state: FSMContext):
             await message.answer("Извините, этот товар закончился.")
             return
 
-        new_order_id_num = len(orders_data["orders"]) + 1
-        new_order_id = f"order-{new_order_id_num:04d}"
-        today = datetime.date.today().isoformat()
+        # Prepare order message for manager
+        order_details = f"""
+        ***НОВЫЙ ЗАКАЗ***
 
-        new_order = {
-            "order_id": new_order_id,
-            "user_id": message.from_user.id,
-            "user_name": data["name"],
-            "item_id": item_id,
-            "item_title": item_title,
-            "quantity": 1,
-            "order_date": today,
-        }
+        **Товар:** {item_title} (ID: {item_id})
+        **Цена:** {item_price} руб.
+        **Количество:** 1
+        **Покупатель:** {data["name"]} (ID: {message.from_user.id})
+        **Телефон:** {data["phone"]}
+        **Адрес:** {data["address"]}
+        **Дата заказа:** {datetime.date.today().isoformat()}
+        """
 
-        orders_data["orders"].append(new_order)
-
-        if await update_orders_data(orders_data) and await update_catalog_data(catalog_data):
+        if await update_catalog_data(catalog_data):
             await message.answer("Ваш заказ принят!")
-            # Notify admin and manager
-            await bot.send_message(ADMIN_USER_ID, f"Новый заказ: {new_order_id}")
-            await bot.send_message(MANAGER_USER_ID, f"Новый заказ: {new_order_id}")
-            if ORDER_CHAT_ID and ORDER_TOPIC_ID:
-                await bot.send_message(ORDER_CHAT_ID, f"Новый заказ: {new_order_id}", message_thread_id=ORDER_TOPIC_ID)
+            # Notify manager in the specified chat and topic
+            try:
+                await bot.send_message(
+                    chat_id=ORDER_CHAT_ID,
+                    message_thread_id=ORDER_TOPIC_ID,
+                    text=order_details,
+                    parse_mode="Markdown"
+                )
+                logging.info(f"Order {item_id} sent to manager chat {ORDER_CHAT_ID}, topic {ORDER_TOPIC_ID}")
+            except Exception as e:
+                logging.error(f"Error sending order message to manager: {e}")
+                await message.answer("Ошибка при отправке деталей заказа менеджеру.")
         else:
-            await message.answer("Ошибка создания заказа на GitHub.")
+            await message.answer("Ошибка обновления каталога.")
+
+@dp.message(lambda message: message.text == "Список товаров")
+async def list_items(message: types.Message):
+    """
+    This handler will be called when user clicks on the "Список товаров" button
+    """
+    catalog_data = await get_catalog_data()
+    if catalog_data is None:
+        await message.answer("Ошибка получения каталога.")
+        return
+        
+    if not catalog_data["items"]:
+        await message.answer("Каталог пуст.")
+        return
+
+    for item in catalog_data["items"]:
+        text = f"{item['title']} - {item['price']} руб."
+        keyboard = types.InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    types.InlineKeyboardButton(text="Edit", callback_data=f"edit_{item['id']}"),
+                    types.InlineKeyboardButton(text="Delete", callback_data=f"delete_{item['id']}")
+                ]
+            ]
+        )
+        await message.answer(text, reply_markup=keyboard)
+
+
+@dp.message(lambda message: message.text == "Активные заказы")
+async def active_orders(message: types.Message):
+    """
+    This handler will be called when user clicks on the "Активные заказы" button
+    """
+    await message.answer("Заказы не хранятся в боте. Все заказы отправляются менеджеру напрямую.")
 
 
 class EditForm(StatesGroup):
@@ -501,7 +438,7 @@ async def process_edit_value(message: types.Message, state: FSMContext):
 
     catalog_data = await get_catalog_data()
     if catalog_data is None:
-        await message.answer("Ошибка получения каталога с GitHub.")
+        await message.answer("Ошибка получения каталога.")
         await state.clear()
         return
 
@@ -516,10 +453,25 @@ async def process_edit_value(message: types.Message, state: FSMContext):
     if await update_catalog_data(catalog_data):
         await message.answer("Товар обновлен!")
     else:
-        await message.answer("Ошибка обновления товара на GitHub.")
+        await message.answer("Ошибка обновления товара.")
 
     await state.clear()
 
+
+@dp.callback_query(lambda c: c.data and c.data.startswith('delete_'))
+async def request_delete_confirmation(callback_query: types.CallbackQuery):
+    item_id = callback_query.data.split('_')[1]
+    
+    keyboard = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(text="Да, удалить", callback_data=f"confirm_delete_{item_id}"),
+                types.InlineKeyboardButton(text="Нет, отмена", callback_data="cancel_delete")
+            ]
+        ]
+    )
+    await callback_query.message.answer(f"Вы уверены, что хотите удалить товар с ID: {item_id}?", reply_markup=keyboard)
+    await callback_query.answer()
 
 
 @dp.callback_query(lambda c: c.data and c.data.startswith('confirm_delete_'))
@@ -528,7 +480,7 @@ async def confirm_delete(callback_query: types.CallbackQuery):
     
     catalog_data = await get_catalog_data()
     if catalog_data is None:
-        await callback_query.message.answer("Ошибка получения каталога с GitHub.")
+        await callback_query.message.answer("Ошибка получения каталога.")
         await callback_query.answer()
         return
 
@@ -537,7 +489,7 @@ async def confirm_delete(callback_query: types.CallbackQuery):
     if await update_catalog_data(catalog_data):
         await callback_query.message.answer(f"Товар с ID: {item_id} удален.")
     else:
-        await callback_query.message.answer("Ошибка удаления товара на GitHub.")
+        await callback_query.message.answer("Ошибка удаления товара.")
     
     await callback_query.answer()
 
@@ -546,6 +498,8 @@ async def confirm_delete(callback_query: types.CallbackQuery):
 async def cancel_delete(callback_query: types.CallbackQuery):
     await callback_query.message.answer("Удаление отменено.")
     await callback_query.answer()
+
+
 
 
 
