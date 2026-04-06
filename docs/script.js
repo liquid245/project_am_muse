@@ -1,3 +1,5 @@
+let isGalleryTransitioning = false;
+
 document.addEventListener('DOMContentLoaded', function () {
     fetch('catalog/catalog.json')
         .then(response => response.json())
@@ -108,6 +110,10 @@ function initGallery(galleryNode, options = {}) {
     const rightArrow = galleryNode.querySelector('.nav-arrow.right');
 
     const openFullscreen = (gallery) => {
+        if (isGalleryTransitioning || document.body.classList.contains('body-no-scroll')) {
+            return;
+        }
+        isGalleryTransitioning = true;
         // --- TOTAL ISOLATION: START ---
         document.body.classList.add('body-no-scroll');
         document.body.style.overflow = 'hidden'; 
@@ -137,14 +143,19 @@ function initGallery(galleryNode, options = {}) {
         initGallery(clonedGallery, { isFullscreen: true });
 
         const closeFullscreen = () => {
-            // --- TOTAL ISOLATION: START ---
-            document.body.classList.remove('body-no-scroll');
-            document.body.style.overflow = '';
+            if (!overlay.isConnected) {
+                return;
+            }
             document.removeEventListener('keydown', onKeydown);
-            // No need to remove the click listener from the overlay, it will be destroyed with the element.
-            // --- TOTAL ISOLATION: END ---
-
             document.body.removeChild(overlay);
+
+            requestAnimationFrame(() => {
+                // --- TOTAL ISOLATION: START ---
+                document.body.classList.remove('body-no-scroll');
+                document.body.style.overflow = '';
+                isGalleryTransitioning = false;
+                // --- TOTAL ISOLATION: END ---
+            });
         };
         
         closeButton.addEventListener('click', (e) => {
@@ -156,6 +167,7 @@ function initGallery(galleryNode, options = {}) {
         overlay.addEventListener('click', (e) => {
             if (e.target === e.currentTarget) {
                 e.stopPropagation(); // Prevent the click from bubbling up to underlying elements
+                e.stopImmediatePropagation(); // Stops other handlers on this same element
                 closeFullscreen();
             }
         });
