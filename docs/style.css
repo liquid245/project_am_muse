@@ -1,8 +1,20 @@
-/* Using CSS Custom Properties as requested for easy theme management */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 :root {
+    --brand-blue: #2D4263;  /* Тот самый осветленный синий */
+    --brand-gold: #F5F1E3;  /* Светлая шампань */
+    --text-muted: rgba(245, 241, 227, 0.7);
     --transition-curve: cubic-bezier(0.25, 0.1, 0.25, 1);
     --transition-duration: 0.4s;
 }
+
+body {
+    background-color: var(--brand-blue);
+    color: var(--brand-gold);
+}
+
 
 /* Gallery Slides */
 .gallery-slide {
@@ -90,18 +102,23 @@
     transform: scale(1.2);
 }
 
+body.body-no-scroll > *:not(.fullscreen-overlay) {
+    pointer-events: none;
+}
+
 /* Fullscreen Overlay Styles */
 .fullscreen-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
@@ -208,28 +225,150 @@
     to { width: 100%; }
 }
 
-/* Mobile-specific styles for product cards */
-@media (max-width: 767px) {
-    /* Hide description */
+/* =================================================================== */
+/* == Глобальные стили для сетки карточек товаров == */
+/* =================================================================== */
+
+#product-grid {
+    display: grid;
+    /* Desktop-first: Set a comfortable minimum width for cards on larger screens */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem; /* Отступ между карточками по умолчанию (десктоп) */
+}
+
+/* --- Стили для карточек товаров: выравнивание кнопки внизу --- */
+
+/* 1. Карточка (.bg-white) становится гибким контейнером, занимающим всю высоту ячейки */
+#product-grid > .bg-white {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important; 
+    min-width: 0; /* Сохраняем для корректной работы сетки */
+    background-color: #FFFFFF !important; /* Белый фон для выделения */
+    color: #1C2B4E !important; /* Темный текст внутри карточки */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Легкая тень для объема */
+}
+
+/* Заголовки карточек */
+#product-grid .text-xl {
+    color: #1C2B4E; /* Темный цвет для заголовка на белом фоне */
+    opacity: 0.9; /* Сохраняем мягкость */
+}
+
+
+
+
+
+
+
+
+/* 2. Контентная часть (div.p-6) растягивается, чтобы занять всё доступное место */
+#product-grid > .bg-white > div.p-6 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Заставляет этот блок занять всё свободное пространство по вертикали */
+}
+
+/* 3. Футер с кнопкой "выталкивается" вниз с помощью margin-top: auto */
+#product-grid > .bg-white > div.p-6 > div.flex.justify-center.items-center.flex-shrink-0 {
+    margin-top: auto !important;
+}
+
+
+/* --- Стили для кнопок "Заказать" --- */
+#product-grid button {
+    color: var(--brand-gold); /* Золотистый текст из переменной */
+    background-color: var(--brand-blue); /* Темно-синий фон из переменной */
+    border: 1px solid var(--brand-gold); /* Рамка в цвет золота */
+    transition: color var(--transition-duration), background-color var(--transition-duration), border-color var(--transition-duration); /* Обновляем transition с переменными */
+}
+
+#product-grid button:hover {
+    color: var(--brand-blue); /* Темно-синий текст при наведении */
+    background-color: var(--brand-gold); /* Золотистый фон при наведении */
+    border-color: var(--brand-blue); /* Рамка в цвет синего для контраста */
+}
+
+/* --- Стили текста интерфейса --- */
+footer p {
+    color: var(--text-muted);
+}
+
+.product-description {
+    color: #1C2B4E;
+}
+
+.site-header-text-left,
+.site-header-text-right {
+    color: var(--brand-gold);
+}
+
+
+
+/* =================================================================== */
+/* == Адаптация для планшетов и смартфонов (до 768px) == */
+/* =================================================================== */
+
+@media (max-width: 768px) {
+    /* 1. Математика сетки: Уменьшаем отступ между карточками */
+    #product-grid {
+        gap: 1rem; /* Tailwind: gap-4. Перебивает дефолтный десктопный отступ. */
+    }
+
+    /* 2. Геометрия изображения: делаем карточки компактнее */
+    .gallery-container {
+        height: 12rem; /* Уменьшено с 14rem */
+    }
+
+    /* 3. Типографика: уменьшаем шрифт и отступы на кнопке */
+    #product-grid button {
+        font-size: 0.9rem; /* ~14px */
+        padding-top: 0.5rem;    /* Tailwind: py-2 */
+        padding-bottom: 0.5rem; /* Tailwind: py-2 */
+    }
+
+    /* Скрываем полное описание товара для экономии места */
     .product-description {
         display: none;
     }
-
-    /* Smaller title text */
-    /* Target h3 within the product card's content div for specificity */
-    .bg-white > div.p-6 > h3.text-xl {
-        font-size: 1rem; /* Equivalent to text-base */
-        margin-bottom: 0.25rem; /* Equivalent to mb-1 */
-    }
-
-    /* Smaller price text */
-    /* Target span within the footer div of the product card for specificity */
-    .bg-white > div.p-6 > div.flex.justify-between.items-center.flex-shrink-0 > span.text-2xl {
-        font-size: 1.25rem; /* Equivalent to text-xl */
-    }
     
-    /* Adjust padding of the content div */
-    .bg-white > div.p-6 {
-        padding: 0.75rem; /* Equivalent to p-3 */
+    /* Уменьшаем отступы внутри карточки */
+    #product-grid .p-6 {
+        padding: 0.75rem; /* Уменьшено с 1rem */
+    }
+
+    /* Уменьшаем заголовок карточки */
+    #product-grid .text-xl {
+        font-size: 1rem; /* Уменьшено с 1.125rem */
     }
 }
+
+/* =================================================================== */
+/* == Переопределение для телефонов (< 600px) для сохранения 2 колонок == */
+/* =================================================================== */
+
+@media (max-width: 600px) {
+    #product-grid {
+        /* On smaller screens, reduce the min-width to ensure 2 columns still fit */
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+/* =================================================================== */
+/* ========= Адаптация только для смартфонов (до 480px) ========= */
+/* =================================================================== */
+
+@media (max-width: 480px) {
+    /* Дополнительные корректировки для очень маленьких экранов, если 2 колонки все еще тесные */
+    /* Здесь можно было бы уменьшить gap, если 1rem все еще много для двух колонок */
+    #product-grid {
+        gap: 0.5rem; /* Немного уменьшаем отступ для очень узких экранов */
+    }
+}
+
+
+
+
+
+
+

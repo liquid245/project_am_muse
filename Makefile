@@ -1,4 +1,4 @@
-.PHONY: all install run-bot run-site run clean
+.PHONY: all install run-bot run-site bust-cache run clean
 
 # ==============================================================================
 # Project AM Muse Makefile
@@ -6,11 +6,22 @@
 # Available commands:
 #   make all        - Install dependencies and run all services (default).
 #   make install    - Create virtual environment and install dependencies.
-#   make run        - Run all services in parallel.
 #   make run-bot    - Run the Telegram bot server.
-#   make run-site   - Run the static site server.
+#   make run-site   - Run the static site server (with cache busting).
+#   make bust-cache - Manually update the CSS cache buster version.
 #   make clean      - Remove virtual environment and temporary files.
 # ==============================================================================
+
+# --- Setup ---
+
+# Define SED_INPLACE for cross-platform compatibility (macOS vs Linux)
+ifeq ($(shell uname), Darwin)
+	SED_INPLACE = sed -i ''
+else
+	SED_INPLACE = sed -i
+endif
+
+# --- Main Targets ---
 
 # Default target
 all: install run
@@ -28,21 +39,21 @@ run-bot:
 	@echo "🤖 Starting Telegram bot server..."
 	bot/.venv/bin/python3 -m dotenv -f bot/.env run bot/.venv/bin/python3 bot/bot.py
 
-# Run the static site server
-run-site:
+# Run the static site server (now with cache busting)
+run-site: bust-cache
 	@echo "🌐 Starting static site server on http://localhost:8000..."
 	python3 -m http.server --directory docs 8000
 
 # Run both bot and site in parallel
 run:
 	@echo "🚀 Starting all services in parallel..."
-	@bash -c ' \
-		python3 -m http.server --directory docs 8000 & PIDS="$!"; \
-		bot/.venv/bin/python3 -m dotenv -f bot/.env run bot/.venv/bin/python3 bot/bot.py & PIDS="$! $PIDS"; \
-		\
-		echo "Started PIDS: $PIDS" ; \
-		trap "kill $PIDS" SIGINT ; \
-		wait \
+	@bash -c ' 
+		(make run-site) & PIDS="$!"; 
+		(make run-bot) & PIDS="$! $PIDS"; 
+		
+		echo "Started PIDS: $PIDS" ; 
+		trap "kill -9 $$PIDS 2>/dev/null" SIGINT ; 
+		wait 
 	'
 
 # Clean up generated files
@@ -50,3 +61,17 @@ clean:
 	@echo "🧹 Cleaning up..."
 	rm -rf bot/.venv
 	@echo "✅ Cleanup complete."
+
+# --- Helper Targets ---
+
+# Updates the cache buster for style.css in the HTML file
+bust-cache:
+	@echo "--- Обновление метки кэша для CSS ---"
+	@if [ -f docs/index.html ]; then \
+		TIMESTAMP=$$(date +%s); \
+		$(SED_INPLACE) "s/style\.css?v=[0-9.]*/style.css?v=$${TIMESTAMP}/g" docs/index.html; \
+		echo "✅ Кэш обновлен: $${TIMESTAMP}"; \
+	else \
+		echo "⚠️  Файл docs/index.html не найден, пропуск."; \
+	fi
+	@echo "------------------------------------"

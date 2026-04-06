@@ -54,21 +54,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 contentDiv.appendChild(description);
 
                 const footerDiv = document.createElement('div');
-                footerDiv.className = 'flex justify-between items-center flex-shrink-0';
-
-                const price = document.createElement('span');
-                price.className = 'text-2xl font-bold text-dark-navy';
-                price.textContent = `${item.price} ₽`;
-                footerDiv.appendChild(price);
+                footerDiv.className = 'flex justify-center items-center flex-shrink-0';
 
                 const button = document.createElement('button');
-                button.className = `bg-dark-navy text-white py-2 px-4 rounded-full hover:bg-peach transition-colors duration-300`;
+                button.className = `bg-dark-navy text-white py-2 px-4 rounded-full hover:bg-peach transition-colors duration-300 w-full`;
+
                 if (item.status === 'sold') {
                     button.classList.add('opacity-50', 'cursor-not-allowed');
                     button.disabled = true;
-                    button.textContent = 'Продано';
+                    button.textContent = `Продано`;
                 } else {
-                    button.textContent = 'Заказать';
+                    button.textContent = `Заказать за ${item.price} ₽`;
                     button.addEventListener('click', () => {
                         const botUsername = 'project_am_muse_bot'; // Actual bot username
                         const payload = `order_${item.id}`;
@@ -112,6 +108,11 @@ function initGallery(galleryNode, options = {}) {
     const rightArrow = galleryNode.querySelector('.nav-arrow.right');
 
     const openFullscreen = (gallery) => {
+        // --- TOTAL ISOLATION: START ---
+        document.body.classList.add('body-no-scroll');
+        document.body.style.overflow = 'hidden'; 
+        // --- TOTAL ISOLATION: END ---
+
         const overlay = document.createElement('div');
         overlay.className = 'fullscreen-overlay';
 
@@ -136,11 +137,29 @@ function initGallery(galleryNode, options = {}) {
         initGallery(clonedGallery, { isFullscreen: true });
 
         const closeFullscreen = () => {
-            document.body.removeChild(overlay);
+            // --- TOTAL ISOLATION: START ---
+            document.body.classList.remove('body-no-scroll');
+            document.body.style.overflow = '';
             document.removeEventListener('keydown', onKeydown);
+            // No need to remove the click listener from the overlay, it will be destroyed with the element.
+            // --- TOTAL ISOLATION: END ---
+
+            document.body.removeChild(overlay);
         };
         
-        closeButton.addEventListener('click', closeFullscreen);
+        closeButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeFullscreen();
+        });
+
+        // Close the gallery if the user clicks on the background (the overlay itself)
+        overlay.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                e.stopPropagation(); // Prevent the click from bubbling up to underlying elements
+                closeFullscreen();
+            }
+        });
+
         const onKeydown = (e) => {
             if (e.key === 'Escape') {
                 closeFullscreen();
@@ -153,7 +172,6 @@ function initGallery(galleryNode, options = {}) {
             }
         };
 
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeFullscreen(); });
         document.addEventListener('keydown', onKeydown);
     };
     

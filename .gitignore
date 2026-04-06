@@ -9,3 +9,4 @@ bot/.venv/
 .DS_Store
 
 # Build artifacts
+.aider*
