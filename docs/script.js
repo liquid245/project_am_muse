@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cardWrapper.className = "bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col h-full";
 
                 const galleryContainer = document.createElement('div');
-                galleryContainer.className = 'gallery-container relative';
+                galleryContainer.className = 'gallery-container card-image relative';
 
                 item.images.forEach((image, index) => {
                     const slide = document.createElement('div');
@@ -126,6 +126,10 @@ function initGallery(galleryNode, options = {}) {
         content.className = 'fullscreen-content';
         
         const clonedGallery = gallery.cloneNode(true);
+        clonedGallery.classList.remove('is-autoplaying');
+        const progress = clonedGallery.querySelector('.autoplay-progress');
+        if (progress) progress.remove();
+
         const newCurrentIndex = gallery === galleryNode ? currentIndex : 0;
         clonedGallery.querySelectorAll('.gallery-slide').forEach((s, i) => s.classList.toggle('active', i === newCurrentIndex));
         clonedGallery.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === newCurrentIndex));
