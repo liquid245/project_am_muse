@@ -247,6 +247,7 @@ body.body-no-scroll > *:not(.fullscreen-overlay) {
     background-color: #FFFFFF !important; /* Белый фон для выделения */
     color: #1C2B4E !important; /* Темный текст внутри карточки */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Легкая тень для объема */
+    transition: transform 0.2s ease-in-out;
 }
 
 /* Заголовки карточек */
@@ -310,9 +311,11 @@ footer p {
 /* =================================================================== */
 
 @media (max-width: 768px) {
-    /* 1. Математика сетки: Уменьшаем отступ между карточками */
+    /* 1. Математика сетки: Устанавливаем единый ритм для отступов */
     #product-grid {
-        gap: 1rem; /* Tailwind: gap-4. Перебивает дефолтный десктопный отступ. */
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Уточненный minmax */
+        gap: 1.5rem;
+        padding: 1.5rem;
     }
 
     /* 2. Геометрия изображения: делаем карточки компактнее */
@@ -349,8 +352,9 @@ footer p {
 
 @media (max-width: 600px) {
     #product-grid {
-        /* On smaller screens, reduce the min-width to ensure 2 columns still fit */
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1rem;
     }
 }
 
@@ -359,11 +363,21 @@ footer p {
 /* =================================================================== */
 
 @media (max-width: 480px) {
-    /* Дополнительные корректировки для очень маленьких экранов, если 2 колонки все еще тесные */
-    /* Здесь можно было бы уменьшить gap, если 1rem все еще много для двух колонок */
     #product-grid {
-        gap: 0.5rem; /* Немного уменьшаем отступ для очень узких экранов */
+        gap: 0.75rem;
+        padding: 0.75rem;
     }
+}
+
+/* =================================================================== */
+/* == Визуальные эффекты карточки при взаимодействии == */
+/* =================================================================== */
+#product-grid > .bg-white:hover,
+#product-grid > .bg-white:active,
+#product-grid > .bg-white:focus-within {
+    position: relative;
+    z-index: 10;
+    /* `transform` is applied by Tailwind's `hover:scale-105` class in script.js */
 }
 
 
