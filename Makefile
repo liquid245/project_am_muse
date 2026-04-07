@@ -36,8 +36,9 @@ install:
 
 # Run the telegram bot
 run-bot:
-	@echo "🤖 Starting Telegram bot server..."
-	bot/.venv/bin/python3 -m dotenv -f bot/.env run bot/.venv/bin/python3 bot/bot.py
+	@echo "🤖 Starting Telegram bot server (Refactored)..."
+	@if [ -f bot/.env ]; then cp bot/.env .env; fi
+	bot/.venv/bin/python3 main.py
 
 # Run the static site server (now with cache busting)
 run-site: bust-cache

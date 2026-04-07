@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     button.textContent = `Заказать за ${item.price} ₽`;
                     button.addEventListener('click', () => {
                         const botUsername = 'project_am_muse_bot'; // Actual bot username
-                        const payload = `order_${item.id}`;
+                        const payload = `${item.id}`;
                         const botDeepLink = `https://t.me/${botUsername}?start=${payload}`;
                         window.open(botDeepLink, '_blank');
                     });
