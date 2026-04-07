@@ -4,9 +4,23 @@ bot/.env
 
 # Python virtual environment
 bot/.venv/
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 
 # macOS system files
 .DS_Store
 
 # Build artifacts
 .aider*
+.git-rewrite/
+*.log
