@@ -19,3 +19,7 @@ IMAGES_DIR = "docs/catalog/images"
 
 # Ссылка на сайт
 SITE_URL = os.getenv("SITE_ADRESS", "https://liquid245.github.io/project_am_muse/")
+
+# Режим отладки
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "t")
+

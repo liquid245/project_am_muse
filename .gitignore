@@ -24,3 +24,4 @@ __pycache__/
 .aider*
 .git-rewrite/
 *.log
+docs/catalog/images/*.jpeg

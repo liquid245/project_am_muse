@@ -9,7 +9,7 @@ lock = asyncio.Lock()
 
 def generate_unique_id():
     """Генерирует уникальный ID на основе текущего времени."""
-    return int(time.time())
+    return str(int(time.time()))
 
 async def read_catalog():
     """Асинхронное чтение файла каталога."""
