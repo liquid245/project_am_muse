@@ -1,6 +1,19 @@
 {
   "items": [
     {
+      "id": "item_1775672176",
+      "title": "123",
+      "description": "3",
+      "price": 123,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-08",
+      "images": [
+        "photo_1775672169802_0.jpeg",
+        "photo_1775672169958_1.jpeg"
+      ]
+    },
+    {
       "id": "1775579496",
       "title": "Тайна океана отредактирована.",
       "description": "Тайна океана отредактирована.",
