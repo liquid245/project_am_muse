@@ -25,3 +25,4 @@ __pycache__/
 .git-rewrite/
 *.log
 docs/catalog/images/*.jpeg
+__pycache__/
