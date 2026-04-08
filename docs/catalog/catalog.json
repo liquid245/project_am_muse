@@ -1,6 +1,18 @@
 {
   "items": [
     {
+      "id": "item_1775651706",
+      "title": "3",
+      "description": "3",
+      "price": 3,
+      "stock": 3,
+      "status": "available",
+      "created_at": "2026-04-08",
+      "images": [
+        "photo_1775651702926_0.jpeg"
+      ]
+    },
+    {
       "id": "item_1775651676",
       "title": "2",
       "description": "2",
