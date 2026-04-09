@@ -1,7 +1,6 @@
 import datetime
 import io
 import logging
-import os
 import time
 
 import aiohttp
@@ -14,7 +13,7 @@ from filters.roles import IsAdmin
 from utils.keyboards import get_cancel_inline, get_save_images_inline
 from utils.storage_manager import StorageManager
 from config import IMAGES_DIR, MASTER_USERNAME, ADMIN_IDS, BOT_USERNAME
-from aiogram.types import FSInputFile, InputMediaPhoto
+from aiogram.types import InputMediaPhoto
 
 items_router = Router()
 

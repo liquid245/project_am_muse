@@ -2,7 +2,6 @@ from aiogram import types, Router, F
 from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import FSInputFile
 from utils.keyboards import get_main_keyboard, get_catalog_inline
 from utils.storage_manager import StorageManager
 from functions.items import send_item_card

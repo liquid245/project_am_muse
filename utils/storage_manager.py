@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple
 from urllib.parse import quote
 from github import Github, GithubException
 
-from config import DEBUG, GITHUB_TOKEN, REPO_NAME, CATALOG_FILE, IMAGES_DIR
+from config import DEBUG, GITHUB_TOKEN, REPO_NAME, CATALOG_FILE, IMAGES_DIR, SITE_URL
 
 class StorageManager:
     """
@@ -118,18 +118,6 @@ class StorageManager:
                     )
         return missing
 
-    def _validate_image_files(self, catalog: dict):
-        """Проверяет наличие всех файлов, упомянутых в каталоге."""
-        missing = self._collect_missing_images(catalog)
-        if missing:
-            details = ", ".join(
-                f"{entry['item_id']}:{entry['filename']}" for entry in missing
-            )
-            raise FileNotFoundError(
-                "Невозможно сохранить каталог: отсутствуют изображения -> "
-                f"{details}"
-            )
-
     def _save_fresh_catalog(self, catalog, sha, commit_message):
         """
         Внутренний метод для безопасного сохранения каталога.
@@ -140,7 +128,6 @@ class StorageManager:
             return False
 
         catalog = self._ensure_image_sources(catalog)
-        self._validate_image_files(catalog)
         new_content_str = json.dumps(catalog, indent=2, ensure_ascii=False)
         
         try:
@@ -232,24 +219,24 @@ class StorageManager:
         return catalog
 
     def get_photo_source(self, filename: str, item_id: str = "Unknown"):
-        """Возвращает источник для фото (предпочитает локальный файл, иначе URL)."""
-        from aiogram.types import FSInputFile
-        from config import SITE_URL
-        
-        # Сначала проверяем локальный файл (самый быстрый и надежный способ)
-        full_path = os.path.join(self.images_path, filename)
-        if os.path.exists(full_path):
-            return FSInputFile(full_path)
-            
-        # Если локально нет, это подозрительно (Requirement #4)
-        logging.warning(f"Warning: Image {filename} for item [{item_id}] is missing on remote (not found locally).")
+        """Возвращает прямую ссылку на изображение из GitHub Pages или raw."""
+        encoded_name = quote(filename)
+        base_site = (SITE_URL or "").rstrip("/")
+        if base_site:
+            return f"{base_site}/catalog/images/{encoded_name}"
 
-        # Если локально нет и мы в режиме GitHub, возвращаем URL (в надежде, что оно там есть)
-        if not self.debug:
-            # На GitHub Pages docs/ является корнем
-            encoded_name = quote(filename)
-            return f"{SITE_URL}catalog/images/{encoded_name}"
-            
+        repo = (REPO_NAME or "").strip()
+        if repo:
+            return (
+                f"https://raw.githubusercontent.com/{repo}/main/{IMAGES_DIR}/{encoded_name}"
+            )
+
+        logging.warning(
+            "Не удалось сформировать ссылку на изображение %s (item %s): "
+            "SITE_URL и REPO_NAME не заданы.",
+            filename,
+            item_id,
+        )
         return None
 
     def update_catalog(self, item_data: dict):

@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from bot.functions.utils import get_catalog_data
+from utils.storage_manager import StorageManager
 
 user_router = Router()
 
@@ -152,30 +153,27 @@ async def show_catalog(message: types.Message):
         )
 
         # Send all images for the item
-        if item.get("images"):
+        images = item.get("images") or []
+        if images:
             media_group = []
-            for img_name in item["images"]:
-                image_path = f"docs/catalog/images/{img_name}"
-                if os.path.exists(image_path):
-                    media_group.append(
-                        types.InputMediaPhoto(media=types.FSInputFile(image_path))
-                    )
+            storage_manager = StorageManager()
+            for img_name in images:
+                photo_source = storage_manager.get_photo_source(
+                    img_name, item_id=str(item.get("id"))
+                )
+                if photo_source:
+                    media_group.append(types.InputMediaPhoto(media=photo_source))
                 else:
-                    logging.warning(f"Image file not found: {image_path}")
+                    logging.warning(
+                        "Image %s missing for item %s", img_name, item.get("id")
+                    )
 
             if media_group:
-                # Add caption to the first photo in the media group
                 media_group[0].caption = caption
                 await message.answer_media_group(media=media_group)
-                await message.answer(
-                    " ", reply_markup=keyboard
-                )  # Send keyboard separately if using media group
-            else:
-                await message.answer(
-                    f"Изображения для '{item['title']}' не найдены.",
-                    reply_markup=keyboard,
-                )
-        else:
-            await message.answer(
-                f"Изображения для '{item['title']}' не найдены.", reply_markup=keyboard
-            )
+                await message.answer(" ", reply_markup=keyboard)
+                return
+
+        await message.answer(
+            f"Изображения для '{item['title']}' не найдены.", reply_markup=keyboard
+        )

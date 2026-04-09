@@ -40,6 +40,11 @@ run-bot:
 	@if [ -f bot/.env ]; then cp bot/.env .env; fi
 	bot/.venv/bin/python3 main.py
 
+run-bot-in-docker:
+	docker build -t am-muse-bot .
+	-docker rm -f am-muse-instance
+	docker run --name am-muse-instance --env-file .env am-muse-bot
+
 # Run the static site server (now with cache busting)
 run-site: bust-cache
 	@echo "🌐 Starting static site server on http://localhost:8000..."
