@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775757301",
+      "title": "Брошь «Орхидея»",
+      "description": "Брошь из перламутрового бисера с жемчугом и подвесками размером 4,5х5,5 см",
+      "price": 4800,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775757296743_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775757296743_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFzmnX5_At0Vg_cZkmc6uwb0eKhQEiAAJsE2sbCv_ASjvrW-kIDLPwAQADAgADeAADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775756902",
       "title": "Брошь «Малиновый мотылёк»",
       "description": "Брошь из бисера и камней с мехом размером 6,5х4 см",
