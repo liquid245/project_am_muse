@@ -54,28 +54,6 @@
           "telegram_file_id": "AgACAgIAAxkBAAIESGnXhk-SvWSxltSiuEGauxa1C3iOAAL5Fmsbozi4Sl6IuXYBLcXqAQADAgADeQADOwQ"
         }
       }
-    },
-    {
-      "id": "1775579496",
-      "title": "Тайна океана отредактирована.",
-      "description": "Тайна океана отредактирована.",
-      "price": 2100,
-      "stock": 0,
-      "status": "sold",
-      "created_at": "2026-03-17",
-      "updated_at": "2026-03-17",
-      "images": [
-        "photo_1775731532125_0.jpeg",
-        "photo_1775731533461_1.jpeg"
-      ],
-      "image_sources": {
-        "photo_1775731532125_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAID72nXg0uwtZPUfN9bN9bQ8zE3XhSZAAKxFGsbena4SjwRjzb-fTeZAQADAgADeAADOwQ"
-        },
-        "photo_1775731533461_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAID7mnXg0sBnbpI4MTcnybUmSbwtyoWAAKwFGsbena4Snjx9TFfubgoAQADAgADeAADOwQ"
-        }
-      }
     }
   ]
 }
