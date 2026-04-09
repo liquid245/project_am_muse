@@ -7,6 +7,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO_NAME = os.getenv("REPO_NAME")
+PROXY_URL = os.getenv("PROXY_URL")
 
 # Роли и ID
 admin_ids_raw = os.getenv("ADMIN_IDS") or os.getenv("ADMIN_USER_ID", "")

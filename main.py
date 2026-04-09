@@ -3,6 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import BOT_TOKEN
+from aiogram.client.session.aiohttp import AiohttpSession
 
 # Импорт роутеров
 from functions.common import common_router

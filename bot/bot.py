@@ -3,6 +3,7 @@ import logging
 import os
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
 from dotenv import load_dotenv
 
 from bot.functions.admin import admin_router
@@ -14,8 +15,13 @@ async def main():
     load_dotenv()
 
     BOT_TOKEN = os.getenv("BOT_TOKEN")
+    PROXY_URL = os.getenv("PROXY_URL")
 
-    bot = Bot(token=BOT_TOKEN)
+    if PROXY_URL:
+        session = AiohttpSession(proxy=PROXY_URL)
+        bot = Bot(token=BOT_TOKEN, session=session)
+    else:
+        bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
 
     # Include routers

@@ -9,10 +9,11 @@ from datetime import datetime, timezone
 from typing import List
 
 from aiogram import Bot
+from aiogram.client.session.aiohttp import AiohttpSession
 from dotenv import load_dotenv
 
 from utils.storage_manager import StorageManager
-from config import BOT_TOKEN
+from config import BOT_TOKEN, PROXY_URL
 
 
 load_dotenv()
@@ -55,7 +56,11 @@ async def restore_missing_images():
     if not token:
         raise SystemExit("BOT_TOKEN обязателен для восстановления изображений.")
 
-    bot = Bot(token=token)
+    if PROXY_URL:
+        session = AiohttpSession(proxy=PROXY_URL)
+        bot = Bot(token=token, session=session)
+    else:
+        bot = Bot(token=token)
     restored = 0
     skipped = []
 
