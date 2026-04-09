@@ -28,3 +28,5 @@ PyCache/
 *.log
 docs/catalog/images/*.jpeg
 __pycache__/
+**/__pycache__/
+*.pyc
