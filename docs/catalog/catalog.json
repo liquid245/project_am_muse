@@ -86,16 +86,8 @@
       "status": "sold",
       "created_at": "2026-03-17",
       "updated_at": "2026-03-17",
-      "images": [
-        "photo_2026-03-17 20.38.22.jpeg",
-        "photo_2026-03-17 20.38.26.jpeg",
-        "photo_2026-03-17 20.38.29.jpeg"
-      ],
-      "image_sources": {
-        "photo_2026-03-17 20.38.22.jpeg": {},
-        "photo_2026-03-17 20.38.26.jpeg": {},
-        "photo_2026-03-17 20.38.29.jpeg": {}
-      }
+      "images": [],
+      "image_sources": {}
     },
     {
       "id": "1775579492",
@@ -106,12 +98,8 @@
       "status": "sold",
       "created_at": "2026-03-17",
       "updated_at": "2026-03-17",
-      "images": [
-        "photo_2026-03-17 20.38.26.jpeg"
-      ],
-      "image_sources": {
-        "photo_2026-03-17 20.38.26.jpeg": {}
-      }
+      "images": [],
+      "image_sources": {}
     },
     {
       "id": "1775579495",
