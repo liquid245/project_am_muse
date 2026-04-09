@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775757785",
+      "title": "Брошь «Звезда»",
+      "description": "Брошь из бисера и камней диаметром 7 см",
+      "price": 4400,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775757781800_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775757781800_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIF52nX6dUdA_ddfUqv9OHRS1M5zPKqAAJ0E2sbCv_ASkAPCp1R2GEdAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775757575",
       "title": "Брошь «Королевский мотылёк»",
       "description": "Брошь из бисера с мехом и камнями, обшитая по краю бисером размером 3х7 см",
