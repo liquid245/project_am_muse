@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775756744",
+      "title": "Брошь «Девушка в шляпе»",
+      "description": "Брошь из бисера и камней размером 5,5х5 см",
+      "price": 4000,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775756741742_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775756741742_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFrGnX5cUvfBA-cj0a-8cwfyuyCfXQAAJEE2sbCv_ASks0SiqHrHMeAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775756449",
       "title": "Серьги «Цветочки»",
       "description": "Серёжки из УФ-смолы в ассортименте с силиконовым наконечником",
