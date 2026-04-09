@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775757575",
+      "title": "Брошь «Королевский мотылёк»",
+      "description": "Брошь из бисера с мехом и камнями, обшитая по краю бисером размером 3х7 см",
+      "price": 4000,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775757572328_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775757572328_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIF2mnX6QQXYtAW05dV_9dFtd9FevffAAJvE2sbCv_ASnwX_J6g_Lk7AQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775757301",
       "title": "Брошь «Орхидея»",
       "description": "Брошь из перламутрового бисера с жемчугом и подвесками размером 4,5х5,5 см",
