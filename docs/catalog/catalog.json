@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775731598",
+      "title": "Красивая брошь 2",
+      "description": "Описание красивой броши 2.",
+      "price": 500,
+      "stock": 2,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775731592605_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775731592605_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIDU2nWvcQjy9ijyf8z1J5ZW-U6L5h_AAJQEWsbena4SvqjmEKsVPvkAQADAgADeAADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775727025",
       "title": "Красивая брошка.",
       "description": "Вдохновляющее описание",
