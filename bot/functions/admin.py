@@ -7,7 +7,8 @@ from aiogram import types, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from bot.functions.utils import get_catalog_data, update_catalog_data, lock
+from bot.functions.utils import lock
+from utils.storage_manager import StorageManager
 
 admin_router = Router()
 
@@ -55,6 +56,22 @@ def get_save_and_cancel_keyboard():
         ]
     )
     return keyboard
+
+
+def _load_catalog_context(command_name: str):
+    """Возвращает StorageManager, свежий каталог и SHA для указанной команды."""
+    storage_manager = StorageManager()
+    try:
+        catalog_data, sha = storage_manager.get_catalog_snapshot(
+            f"admin:{command_name}"
+        )
+        return storage_manager, catalog_data, sha
+    except Exception as exc:
+        logging.error(
+            "Ошибка получения каталога для команды %s: %s", command_name, exc,
+            exc_info=True
+        )
+        return storage_manager, None, None
 
 
 @admin_router.callback_query(lambda c: c.data == "cancel_add_item")
@@ -166,12 +183,13 @@ async def process_new_item(message: types.Message, state: FSMContext):
             logging.error(f"Error saving image {file_id}: {e}")
             await message.answer(f"Ошибка при сохранении изображения: {e}")
 
-    catalog_data = await get_catalog_data()
+    storage_manager, catalog_data, sha = _load_catalog_context("add_item")
     if catalog_data is None:
         await message.answer("Ошибка получения каталога.")
         return
 
-    new_id_num = len(catalog_data["items"]) + 1
+    items = catalog_data.get("items", [])
+    new_id_num = len(items) + 1
     new_id = f"brooch-{new_id_num:04d}"
 
     today = datetime.date.today().isoformat()
@@ -188,9 +206,19 @@ async def process_new_item(message: types.Message, state: FSMContext):
         "images": saved_image_names,
     }
 
-    catalog_data["items"].append(new_item)
+    items.append(new_item)
+    catalog_data["items"] = items
 
-    if await update_catalog_data(catalog_data):
+    try:
+        save_ok = storage_manager.save_catalog_snapshot(
+            catalog_data, sha, f"Bot Update: add item {new_id}"
+        )
+    except Exception as exc:
+        logging.error("Ошибка при сохранении товара в GitHub: %s", exc, exc_info=True)
+        await message.answer("❌ Ошибка синхронизации с GitHub. Товар НЕ добавлен.")
+        return
+
+    if save_ok:
         await message.answer("Товар добавлен!")
     else:
         await message.answer("Ошибка добавления товара.")
@@ -198,16 +226,17 @@ async def process_new_item(message: types.Message, state: FSMContext):
 
 @admin_router.message(lambda message: message.text == "Список товаров")
 async def list_items(message: types.Message):
-    catalog_data = await get_catalog_data()
+    _, catalog_data, _ = _load_catalog_context("list_items")
     if catalog_data is None:
         await message.answer("Ошибка получения каталога.")
         return
 
-    if not catalog_data["items"]:
+    items = catalog_data.get("items", [])
+    if not items:
         await message.answer("Каталог пуст.")
         return
 
-    for item in catalog_data["items"]:
+    for item in items:
         text = f"{item['title']} - {item['price']} руб."
         keyboard = types.InlineKeyboardMarkup(
             inline_keyboard=[
@@ -302,18 +331,40 @@ async def process_edit_value(message: types.Message, state: FSMContext):
             return
         new_value = int(new_value)
 
-    catalog_data = await get_catalog_data()
+    storage_manager, catalog_data, sha = _load_catalog_context("edit_field")
     if catalog_data is None:
         await message.answer("Ошибка получения каталога.")
         await state.clear()
         return
 
-    for item in catalog_data["items"]:
+    updated = False
+    for item in catalog_data.get("items", []):
         if item["id"] == item_id:
             item[field] = new_value
+            updated = True
             break
 
-    if await update_catalog_data(catalog_data):
+    if not updated:
+        await message.answer("Товар не найден.")
+        await state.clear()
+        return
+
+    try:
+        save_ok = storage_manager.save_catalog_snapshot(
+            catalog_data, sha, f"Bot Update: edit item {item_id}"
+        )
+    except Exception as exc:
+        logging.error(
+            "Ошибка синхронизации при обновлении товара %s: %s", item_id, exc,
+            exc_info=True
+        )
+        await message.answer(
+            "❌ Ошибка синхронизации с GitHub. Изменения не сохранены."
+        )
+        await state.clear()
+        return
+
+    if save_ok:
         await message.answer("Товар обновлен!")
     else:
         await message.answer("Ошибка обновления товара.")
@@ -380,18 +431,40 @@ async def process_edited_item_images(message: types.Message, state: FSMContext):
             logging.error(f"Error saving image {file_id}: {e}")
             await message.answer(f"Ошибка при сохранении изображения: {e}")
 
-    catalog_data = await get_catalog_data()
+    storage_manager, catalog_data, sha = _load_catalog_context("edit_images")
     if catalog_data is None:
         await message.answer("Ошибка получения каталога.")
         await state.clear()
         return
 
-    for item in catalog_data["items"]:
+    updated = False
+    for item in catalog_data.get("items", []):
         if item["id"] == item_id:
             item["images"] = saved_image_names
+            updated = True
             break
 
-    if await update_catalog_data(catalog_data):
+    if not updated:
+        await message.answer("Товар не найден.")
+        await state.clear()
+        return
+
+    try:
+        save_ok = storage_manager.save_catalog_snapshot(
+            catalog_data, sha, f"Bot Update: edit images {item_id}"
+        )
+    except Exception as exc:
+        logging.error(
+            "Ошибка синхронизации при обновлении фотографий %s: %s", item_id, exc,
+            exc_info=True
+        )
+        await message.answer(
+            "❌ Ошибка синхронизации с GitHub. Изображения не обновлены."
+        )
+        await state.clear()
+        return
+
+    if save_ok:
         await message.answer("Изображения товара обновлены!")
     else:
         await message.answer("Ошибка обновления товара.")
@@ -425,20 +498,43 @@ async def request_delete_confirmation(callback_query: types.CallbackQuery):
 async def confirm_delete(callback_query: types.CallbackQuery):
     item_id = callback_query.data.split("_")[2]
 
-    catalog_data = await get_catalog_data()
+    storage_manager, catalog_data, sha = _load_catalog_context("delete_item")
     if catalog_data is None:
         await callback_query.message.answer("Ошибка получения каталога.")
         await callback_query.answer()
         return
 
-    catalog_data["items"] = [
-        item for item in catalog_data["items"] if item["id"] != item_id
-    ]
+    items = catalog_data.get("items", [])
+    new_items = [item for item in items if item["id"] != item_id]
 
-    if await update_catalog_data(catalog_data):
+    if len(new_items) == len(items):
+        await callback_query.message.answer("Товар не найден.")
+        await callback_query.answer()
+        return
+
+    catalog_data["items"] = new_items
+
+    try:
+        save_ok = storage_manager.save_catalog_snapshot(
+            catalog_data, sha, f"Bot Update: delete item {item_id}"
+        )
+    except Exception as exc:
+        logging.error(
+            "Ошибка синхронизации при удалении товара %s: %s", item_id, exc,
+            exc_info=True
+        )
+        await callback_query.message.answer(
+            "❌ Ошибка синхронизации с GitHub. Товар НЕ удален."
+        )
+        await callback_query.answer()
+        return
+
+    if save_ok:
         await callback_query.message.answer(f"Товар с ID: {item_id} удален.")
     else:
-        await callback_query.message.answer("Ошибка удаления товара.")
+        await callback_query.message.answer(
+            "❌ Ошибка синхронизации с GitHub. Товар НЕ удален."
+        )
 
     await callback_query.answer()
 

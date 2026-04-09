@@ -96,7 +96,13 @@ async def process_photos(
         await message.bot.download(photo, destination=in_memory_file)
         in_memory_file.seek(0)  # Возвращаем курсор в начало файла
 
-        temp_photos.append({"filename": file_name, "data": in_memory_file.read()})
+        temp_photos.append(
+            {
+                "filename": file_name,
+                "data": in_memory_file.read(),
+                "telegram_file_id": photo.file_id,
+            }
+        )
 
     await state.update_data(temp_photos=temp_photos)
     await status_msg.edit_text(
@@ -121,11 +127,17 @@ async def save_item_final(callback: types.CallbackQuery, state: FSMContext):
 
         # 1. Сохраняем все фото
         saved_image_filenames = []
+        image_sources = {}
         for photo_data in temp_photos:
             filename = storage_manager.save_photo(
                 photo_data["data"], photo_data["filename"]
             )
             saved_image_filenames.append(filename)
+            telegram_file_id = photo_data.get("telegram_file_id")
+            meta = {}
+            if telegram_file_id:
+                meta["telegram_file_id"] = telegram_file_id
+            image_sources[filename] = meta
 
         # 2. Если все фото сохранены, формируем и сохраняем данные о товаре
         new_id = f"item_{int(time.time())}"
@@ -140,6 +152,7 @@ async def save_item_final(callback: types.CallbackQuery, state: FSMContext):
             "status": "available",
             "created_at": today,
             "images": saved_image_filenames,
+            "image_sources": image_sources,
         }
 
         storage_manager.update_catalog(new_item)

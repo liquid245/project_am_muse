@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from typing import Dict, List, Tuple
 from github import Github, GithubException
 
 from config import DEBUG, GITHUB_TOKEN, REPO_NAME, CATALOG_FILE, IMAGES_DIR
@@ -39,11 +40,14 @@ class StorageManager:
         
         self.initialized = True
 
-    def _fetch_fresh_catalog(self):
+    def _fetch_fresh_catalog(self, command_name: str = "unspecified"):
         """
         Внутренний метод для получения САМОЙ СВЕЖЕЙ версии каталога и его SHA.
         Всегда запрашивает данные напрямую из API GitHub.
         """
+        logging.info(
+            f"Fetching fresh data from GitHub for command [{command_name}]..."
+        )
         if self.debug:
             if not os.path.exists(self.catalog_path):
                 return {"items": []}, None
@@ -68,6 +72,63 @@ class StorageManager:
                 logging.error(f"Непредвиденная ошибка при чтении каталога: {e}")
                 raise
 
+    def _ensure_image_sources(self, catalog: dict) -> dict:
+        """Гарантирует наличие image_sources для каждого товара."""
+        if not isinstance(catalog, dict):
+            return catalog
+        items = catalog.get("items", [])
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            images = item.get("images", []) or []
+            image_sources = item.get("image_sources")
+            if not isinstance(image_sources, dict):
+                image_sources = {}
+            for image_name in images:
+                image_sources.setdefault(image_name, {})
+            item["image_sources"] = image_sources
+        return catalog
+
+    def _collect_missing_images(self, catalog: dict) -> List[Dict[str, str]]:
+        """Собирает список отсутствующих файлов согласно каталогу."""
+        missing = []
+        items = catalog.get("items", []) if isinstance(catalog, dict) else []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            item_id = str(item.get("id"))
+            title = item.get("title", "")
+            image_sources = item.get("image_sources") or {}
+            for filename in item.get("images", []) or []:
+                full_path = os.path.join(self.images_path, filename)
+                if not os.path.exists(full_path):
+                    telegram_file_id = None
+                    if isinstance(image_sources, dict):
+                        telegram_file_id = (
+                            image_sources.get(filename, {}) or {}
+                        ).get("telegram_file_id")
+                    missing.append(
+                        {
+                            "item_id": item_id,
+                            "item_title": title,
+                            "filename": filename,
+                            "telegram_file_id": telegram_file_id,
+                        }
+                    )
+        return missing
+
+    def _validate_image_files(self, catalog: dict):
+        """Проверяет наличие всех файлов, упомянутых в каталоге."""
+        missing = self._collect_missing_images(catalog)
+        if missing:
+            details = ", ".join(
+                f"{entry['item_id']}:{entry['filename']}" for entry in missing
+            )
+            raise FileNotFoundError(
+                "Невозможно сохранить каталог: отсутствуют изображения -> "
+                f"{details}"
+            )
+
     def _save_fresh_catalog(self, catalog, sha, commit_message):
         """
         Внутренний метод для безопасного сохранения каталога.
@@ -77,6 +138,8 @@ class StorageManager:
             logging.error("Попытка сохранить некорректный каталог. Отмена.")
             return False
 
+        catalog = self._ensure_image_sources(catalog)
+        self._validate_image_files(catalog)
         new_content_str = json.dumps(catalog, indent=2, ensure_ascii=False)
         
         try:
@@ -107,6 +170,21 @@ class StorageManager:
             logging.error(f"Ошибка при сохранении каталога на GitHub: {e}")
             raise
 
+    def get_catalog_snapshot(self, command_name: str = "get_catalog_snapshot") -> Tuple[dict, str]:
+        """Возвращает свежий каталог и его SHA с логированием команды."""
+        return self._fetch_fresh_catalog(command_name)
+
+    def audit_missing_images(self) -> Tuple[dict, str, List[Dict[str, str]]]:
+        """Возвращает свежий каталог, его SHA и список отсутствующих изображений."""
+        catalog, sha = self._fetch_fresh_catalog("audit_missing_images")
+        catalog = self._ensure_image_sources(catalog)
+        missing = self._collect_missing_images(catalog)
+        return catalog, sha, missing
+
+    def save_catalog_snapshot(self, catalog: dict, sha: str, commit_message: str):
+        """Публичный метод для сохранения целого каталога после правок."""
+        return self._save_fresh_catalog(catalog, sha, commit_message)
+
     def save_photo(self, file_bytes: bytes, filename: str) -> str:
         """Сохраняет фото локально (всегда) и в репозиторий GitHub (если не DEBUG)."""
         try:
@@ -134,42 +212,18 @@ class StorageManager:
             raise
 
     def delete_photo(self, filename: str, manual: bool = False):
-        """
-        Удаляет фото локально.
-        Удаление на GitHub отключено для безопасности данных (ABSOLUTE BAN on Auto-Cleanup).
-        """
-        try:
-            full_path = os.path.join(self.images_path, filename)
-            if os.path.exists(full_path):
-                os.remove(full_path)
-                logging.info(f"Фото локально удалено: {full_path}")
-            
-            # Раньше здесь было автоматическое удаление с GitHub. 
-            # Теперь мы его отключаем (Requirement #1 & #3).
-            if manual and not self.debug:
-                # Оставляем закомментированным на случай, если действительно понадобится РУЧНОЕ удаление через код
-                # github_path = f"{self.images_path}/{filename}"
-                # try:
-                #     contents = self.repo.get_contents(github_path, ref="main")
-                #     self.repo.delete_file(
-                #         path=github_path,
-                #         message=f"Manual Admin Action: remove image {filename}",
-                #         sha=contents.sha,
-                #         branch="main"
-                #     )
-                #     logging.info(f"Фото удалено с GitHub (вручную): {github_path}")
-                # except GithubException as e:
-                #     if e.status != 404: raise
-                logging.warning(f"Запрос на РУЧНОЕ удаление {filename} проигнорирован (Data Safety Mode).")
-            elif not manual:
-                logging.info(f"Автоматическое удаление {filename} с GitHub пропущено (Data Safety Mode).")
-
-        except Exception as e:
-            logging.error(f"Ошибка при удалении фото '{filename}': {e}")
+        """Полностью отключенное удаление (защита от автоматического клинапа)."""
+        logging.warning(
+            "Удаление изображения %s отклонено. Data Safety Mode активен.", filename
+        )
+        if manual:
+            logging.warning(
+                "Даже ручной запрос на удаление %s не выполняется программно.", filename
+            )
 
     def get_catalog(self):
         """Публичный метод для получения текущего каталога."""
-        catalog, _ = self._fetch_fresh_catalog()
+        catalog, _ = self._fetch_fresh_catalog("get_catalog")
         return catalog
 
     def get_photo_source(self, filename: str, item_id: str = "Unknown"):
@@ -198,13 +252,13 @@ class StorageManager:
         Всегда запрашивает свежие данные перед изменением.
         """
         try:
-            catalog, sha = self._fetch_fresh_catalog()
+            item_id = item_data.get('id')
+            catalog, sha = self._fetch_fresh_catalog(f"update_catalog:{item_id}")
             items = catalog.get("items", [])
             initial_count = len(items)
             
             logging.info(f"Свежее чтение: получено {initial_count} товаров.")
 
-            item_id = item_data.get('id')
             updated = False
             for i, item in enumerate(items):
                 if item.get('id') == item_id:
@@ -231,7 +285,7 @@ class StorageManager:
         Всегда запрашивает свежие данные перед удалением.
         """
         try:
-            catalog, sha = self._fetch_fresh_catalog()
+            catalog, sha = self._fetch_fresh_catalog(f"delete_item:{item_id}")
             items = catalog.get("items", [])
             initial_count = len(items)
             
@@ -256,7 +310,7 @@ class StorageManager:
         Новые товары, которых нет в ordered_ids, сохраняются в начале.
         """
         try:
-            catalog, sha = self._fetch_fresh_catalog()
+            catalog, sha = self._fetch_fresh_catalog("reorder_catalog")
             fresh_items = catalog.get("items", [])
             
             # Создаем словарь для быстрого доступа
@@ -293,4 +347,3 @@ class StorageManager:
         except Exception as e:
             logging.error(f"Ошибка при reorder_catalog: {e}")
             raise
-

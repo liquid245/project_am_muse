@@ -50,11 +50,7 @@ async def process_delete_item_confirm(callback: types.CallbackQuery, state: FSMC
     
     storage_manager = StorageManager()
     try:
-        # 1. Удаляем фото (помечаем как ручное действие)
-        for img in item.get("images", []):
-            storage_manager.delete_photo(img, manual=True)
-            
-        # 2. Удаляем из каталога
+        # Удаляем только запись товара. Файлы остаются для безопасности.
         if storage_manager.delete_item(item_id):
             await callback.message.answer(f"🗑️ Товар успешно удален.")
         else:
@@ -193,6 +189,7 @@ async def process_new_photos(message: types.Message, state: FSMContext, album: l
     status_msg = await message.answer(f"⏳ Загружаю {len(messages)} фотографии...")
     
     new_image_filenames = []
+    new_image_sources = {}
     try:
         # 1. Загружаем новые фото
         for idx, m in enumerate(messages):
@@ -206,9 +203,14 @@ async def process_new_photos(message: types.Message, state: FSMContext, album: l
             
             filename = storage_manager.save_photo(in_memory_file.read(), file_name)
             new_image_filenames.append(filename)
+            meta = {}
+            if photo.file_id:
+                meta["telegram_file_id"] = photo.file_id
+            new_image_sources[filename] = meta
 
         # 2. Обновляем данные товара (старые фото остаются в хранилище для безопасности)
         temp_item["images"] = new_image_filenames
+        temp_item["image_sources"] = new_image_sources
         await state.update_data(temp_item=temp_item)
         
         await status_msg.edit_text("✅ Фотографии обновлены.")

@@ -1,4 +1,4 @@
-.PHONY: all install run-bot run-site bust-cache run clean
+.PHONY: all install run-bot run-site bust-cache run clean audit-images restore-images
 
 # ==============================================================================
 # Project AM Muse Makefile
@@ -76,3 +76,13 @@ bust-cache:
 		echo "⚠️  Файл docs/index.html не найден, пропуск."; \
 	fi
 	@echo "------------------------------------"
+
+# --- Integrity helpers ---
+
+audit-images:
+	@echo "🔍 Проверяю целостность каталога..."
+	python3 -m tools.catalog_guard audit
+
+restore-images:
+	@echo "♻️ Пытаюсь восстановить отсутствующие изображения..."
+	python3 -m tools.catalog_guard restore
