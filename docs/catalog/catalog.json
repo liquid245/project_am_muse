@@ -36,19 +36,19 @@
     },
     {
       "id": "item_1775672176",
-      "title": "123",
-      "description": "3",
-      "price": 123,
+      "title": "Новое название",
+      "description": "Шикарное описание",
+      "price": 1500,
       "stock": 0,
       "status": "sold",
       "created_at": "2026-04-08",
       "images": [
-        "photo_1775672169802_0.jpeg",
-        "photo_1775672169958_1.jpeg"
+        "photo_1775732303819_0.jpeg"
       ],
       "image_sources": {
-        "photo_1775672169802_0.jpeg": {},
-        "photo_1775672169958_1.jpeg": {}
+        "photo_1775732303819_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIESGnXhk-SvWSxltSiuEGauxa1C3iOAAL5Fmsbozi4Sl6IuXYBLcXqAQADAgADeQADOwQ"
+        }
       }
     },
     {
