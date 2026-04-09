@@ -5,8 +5,8 @@
       "title": "Брошь «Звезда»",
       "description": "Брошь из бисера и камней диаметром 7 см",
       "price": 4400,
-      "stock": 1,
-      "status": "available",
+      "stock": 0,
+      "status": "sold",
       "created_at": "2026-04-09",
       "images": [
         "photo_1775757781800_0.jpeg"
