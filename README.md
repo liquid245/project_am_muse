@@ -84,7 +84,7 @@ project_am_muse/
 - ADMIN_USER_ID (твой ID)
 - MANAGER_USER_ID (ID Анастасии)
 - REPO_NAME (например, baegon/brooch-catalog)
-- PROXY_URL (опционально для PythonAnywhere, формат http://proxy.server:3128)
+- Полный список и примеры значений см. в `.env.example`.
 
 ### 8. Что убрали для максимальной простоты
 
