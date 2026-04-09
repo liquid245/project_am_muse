@@ -1,6 +1,27 @@
 {
   "items": [
     {
+      "id": "item_1775756449",
+      "title": "Серьги «Цветочки»",
+      "description": "Серёжки из УФ-смолы в ассортименте с силиконовым наконечником",
+      "price": 1000,
+      "stock": 10,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775756405089_0.jpeg",
+        "photo_1775756405429_1.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775756405089_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFk2nX5HT_Wl8QCB9AcQlzmTXy-67NAAI5E2sbCv_ASgGpQ_u4q_weAQADAgADeQADOwQ"
+        },
+        "photo_1775756405429_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFlGnX5HT6f0xxmUUsCaBrkAavRefhAAI6E2sbCv_ASuYX6lqN6Bl-AQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775753053",
       "title": "Тестовый товар 2",
       "description": "Здесь твои описание товара 2",
