@@ -122,23 +122,6 @@
           "telegram_file_id": "AgACAgIAAxkBAAIFYWnX1nNx-of545Oo9kiv49kzaI6kAAJ9Fmsb8t_ASs9PGhgIVUIDAQADAgADeAADOwQ"
         }
       }
-    },
-    {
-      "id": "item_1775752749",
-      "title": "тестовый товар",
-      "description": "Тестовое описание.",
-      "price": 1,
-      "stock": 1,
-      "status": "available",
-      "created_at": "2026-04-09",
-      "images": [
-        "photo_1775753194571_0.jpeg"
-      ],
-      "image_sources": {
-        "photo_1775753194571_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIFc2nX1-rWtojPjQkjI9e6UwABnjeU8wACiRZrG_LfwEoRBQABRPbvfToBAAMCAAN4AAM7BA"
-        }
-      }
     }
   ]
 }
