@@ -26,19 +26,11 @@
       "status": "available",
       "created_at": "2026-04-09",
       "images": [
-        "photo_1775752740556_0.jpeg",
-        "photo_1775752740912_1.jpeg",
-        "photo_1775752741117_2.jpeg"
+        "photo_1775753194571_0.jpeg"
       ],
       "image_sources": {
-        "photo_1775752740556_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIBcWnWRrlekIygP9hBm1N4-GgZL13RAAIHFWsbenawSgzt3t4D-tnYAQADAgADbQADOwQ"
-        },
-        "photo_1775752740912_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIBgGnWR_VEkFmKE2lIixvfWr4MJj0FAAIQFWsbenawSkujk5MkxGEIAQADAgADeAADOwQ"
-        },
-        "photo_1775752741117_2.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIBumnWS1M6-aoGllA6RaUf76mEelaSAAIgFWsbenawSqGN3bdYVUs1AQADAgADeAADOwQ"
+        "photo_1775753194571_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFc2nX1-rWtojPjQkjI9e6UwABnjeU8wACiRZrG_LfwEoRBQABRPbvfToBAAMCAAN4AAM7BA"
         }
       }
     }
