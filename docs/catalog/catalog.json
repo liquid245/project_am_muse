@@ -39,8 +39,8 @@
       "title": "123",
       "description": "3",
       "price": 123,
-      "stock": 1,
-      "status": "available",
+      "stock": 0,
+      "status": "sold",
       "created_at": "2026-04-08",
       "images": [
         "photo_1775672169802_0.jpeg",
