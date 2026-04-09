@@ -4,6 +4,8 @@ import logging
 import os
 import time
 
+import aiohttp
+
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -211,35 +213,118 @@ async def send_item_card(message: types.Message, item: dict, is_admin: bool):
     )
     if action_links:
         caption += f"\n\n<b>Действия:</b>\n{action_links}"
-    images = item.get("images", [])
+    images = list(item.get("images", []) or [])
+    image_sources = dict(item.get("image_sources") or {})
     storage_manager = StorageManager()
     
     item_id = str(item.get("id", "Unknown"))
-    if images:
-        if len(images) == 1:
-            photo = storage_manager.get_photo_source(images[0], item_id=item_id)
-            if photo:
-                await message.answer_photo(
-                    photo=photo,
-                    caption=caption,
-                    parse_mode="HTML"
+
+    def resolve_photo_source(image_name: str):
+        meta = image_sources.get(image_name) or {}
+        telegram_file_id = meta.get("telegram_file_id")
+        if telegram_file_id:
+            return telegram_file_id
+        return storage_manager.get_photo_source(image_name, item_id=item_id)
+
+    removed_images: list[str] = []
+    catalog_data = None
+    catalog_sha = None
+    catalog_dirty = False
+    media: list[InputMediaPhoto] = []
+    session: aiohttp.ClientSession | None = None
+
+    async def ensure_url_available(url: str) -> bool:
+        nonlocal session
+        if session is None:
+            timeout = aiohttp.ClientTimeout(total=2)
+            session = aiohttp.ClientSession(timeout=timeout)
+        try:
+            async with session.head(url, allow_redirects=True) as response:
+                return response.status == 200
+        except Exception as exc:
+            logging.warning(f"HEAD check failed for {url}: {exc}")
+            return False
+
+    try:
+        for img_name in images:
+            photo = resolve_photo_source(img_name)
+            if isinstance(photo, str) and photo.startswith(("http://", "https://")):
+                is_available = await ensure_url_available(photo)
+                if not is_available:
+                    logging.error(
+                        f"Image {photo} is broken, removing from catalog."
+                    )
+                    removed_images.append(img_name)
+                    continue
+
+            if not photo:
+                continue
+
+            if not media:
+                media.append(
+                    InputMediaPhoto(
+                        media=photo,
+                        caption=caption,
+                        parse_mode="HTML"
+                    )
                 )
             else:
-                await message.answer(caption, parse_mode="HTML")
+                media.append(InputMediaPhoto(media=photo))
+
+        if removed_images:
+            catalog_data, catalog_sha = storage_manager.get_catalog_snapshot(
+                "cleanup_missing_images"
+            )
+            updated_item_entry = None
+            items_list = catalog_data.get("items", [])
+            for entry in items_list:
+                if not isinstance(entry, dict):
+                    continue
+
+                entry_images = entry.get("images", []) or []
+                filtered_images = [
+                    img for img in entry_images if img not in removed_images
+                ]
+                if len(filtered_images) != len(entry_images):
+                    entry["images"] = filtered_images
+                    catalog_dirty = True
+
+                entry_sources = entry.get("image_sources") or {}
+                removed_any = False
+                for removed in removed_images:
+                    if removed in entry_sources:
+                        entry_sources.pop(removed, None)
+                        removed_any = True
+                if removed_any:
+                    entry["image_sources"] = entry_sources
+                    catalog_dirty = True
+
+                if str(entry.get("id")) == item_id:
+                    updated_item_entry = entry
+
+            if updated_item_entry:
+                item["images"] = updated_item_entry.get("images", [])
+                item["image_sources"] = (
+                    updated_item_entry.get("image_sources") or {}
+                )
+
+        if not media:
+            await message.answer(caption, parse_mode="HTML")
+        elif len(media) == 1:
+            single = media[0]
+            await message.answer_photo(
+                photo=single.media,
+                caption=single.caption,
+                parse_mode=single.parse_mode
+            )
         else:
-            # Media group
-            media = []
-            for i, img_name in enumerate(images):
-                photo = storage_manager.get_photo_source(img_name, item_id=item_id)
-                if photo:
-                    if i == 0:
-                        media.append(InputMediaPhoto(media=photo, caption=caption, parse_mode="HTML"))
-                    else:
-                        media.append(InputMediaPhoto(media=photo))
-            
-            if media:
-                await message.answer_media_group(media=media)
-            else:
-                await message.answer(caption, parse_mode="HTML")
-    else:
-        await message.answer(caption, parse_mode="HTML")
+            await message.answer_media_group(media=media)
+    finally:
+        if session:
+            await session.close()
+        if catalog_dirty and catalog_data is not None:
+            storage_manager.save_catalog(
+                catalog=catalog_data,
+                sha=catalog_sha,
+                commit_message=f"Bot Cleanup: remove broken images for {item_id}"
+            )

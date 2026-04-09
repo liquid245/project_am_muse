@@ -11,11 +11,13 @@ ENV/
 
 # Python cache
 __pycache__/
+PyCache/
 *.py[cod]
 *$py.class
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.pyc
 
 # macOS system files
 .DS_Store

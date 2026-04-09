@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from typing import Dict, List, Tuple
+from urllib.parse import quote
 from github import Github, GithubException
 
 from config import DEBUG, GITHUB_TOKEN, REPO_NAME, CATALOG_FILE, IMAGES_DIR
@@ -185,6 +186,10 @@ class StorageManager:
         """Публичный метод для сохранения целого каталога после правок."""
         return self._save_fresh_catalog(catalog, sha, commit_message)
 
+    def save_catalog(self, catalog: dict, sha: str, commit_message: str):
+        """Сохраняет переданный каталог с заданным SHA."""
+        return self._save_fresh_catalog(catalog, sha, commit_message)
+
     def save_photo(self, file_bytes: bytes, filename: str) -> str:
         """Сохраняет фото локально (всегда) и в репозиторий GitHub (если не DEBUG)."""
         try:
@@ -242,7 +247,8 @@ class StorageManager:
         # Если локально нет и мы в режиме GitHub, возвращаем URL (в надежде, что оно там есть)
         if not self.debug:
             # На GitHub Pages docs/ является корнем
-            return f"{SITE_URL}catalog/images/{filename}"
+            encoded_name = quote(filename)
+            return f"{SITE_URL}catalog/images/{encoded_name}"
             
         return None
 
