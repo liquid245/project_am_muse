@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1775756902",
+      "title": "Брошь «Малиновый мотылёк»",
+      "description": "Брошь из бисера и камней с мехом размером 6,5х4 см",
+      "price": 4000,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775756899806_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1775756899806_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIFvmnX5mMNKvIvFAfV37U5r6lgBGtgAAJME2sbCv_ASmY9wdraVugNAQADAgADeAADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775756744",
       "title": "Брошь «Девушка в шляпе»",
       "description": "Брошь из бисера и камней размером 5,5х5 см",
