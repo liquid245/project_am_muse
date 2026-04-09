@@ -1,6 +1,19 @@
 {
   "items": [
     {
+      "id": "item_1775727025",
+      "title": "Красивая брошка.",
+      "description": "Вдохновляющее описание",
+      "price": 1000,
+      "stock": 1,
+      "status": "available",
+      "created_at": "2026-04-09",
+      "images": [
+        "photo_1775727018950_0.jpeg",
+        "photo_1775727019278_1.jpeg"
+      ]
+    },
+    {
       "id": "item_1775672176",
       "title": "123",
       "description": "3",
