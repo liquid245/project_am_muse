@@ -1,3 +1,4 @@
+from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from config import ADMIN_IDS, SITE_URL
 
@@ -6,13 +7,12 @@ def get_main_keyboard(user_id: int):
     kb = ReplyKeyboardBuilder()
     
     if user_id in ADMIN_IDS:
-        # Меню для админа
+        # Админ видит как свои кнопки, так и пользовательские
         kb.button(text="➕ Добавить товар")
-        kb.button(text="✏️ Редактировать")
-        kb.button(text="🗑️ Удалить")
-        kb.button(text="🔄 Порядок сортировки")
+        kb.button(text="📝 Список товаров")
         kb.button(text="🌐 Открыть каталог")
-        kb.adjust(2, 2, 1)
+        kb.button(text="✍️ Написать менеджеру")
+        kb.adjust(2)
     else:
         # Меню для пользователя
         kb.button(text="🌐 Открыть каталог")

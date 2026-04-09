@@ -1,3 +1,5 @@
 aiogram
 PyGithub
 python-dotenv
+qrcode
+Pillow

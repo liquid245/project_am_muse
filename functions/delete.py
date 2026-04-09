@@ -1,18 +1,20 @@
 from aiogram import types, Router, F
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from filters.roles import IsAdmin
-from utils.json_handler import read_catalog, write_catalog
-from utils.github_client import sync_catalog_to_github
+from utils.storage_manager import StorageManager
 
 delete_router = Router()
 
 @delete_router.message(F.text == "🗑️ Удалить", IsAdmin())
 async def delete_list_start(message: types.Message):
     """Выбор товара для удаления из последних 10."""
-    catalog = await read_catalog()
-    if not catalog["items"]:
+    storage_manager = StorageManager()
+    catalog = storage_manager.get_catalog()
+    
+    if not catalog.get("items"):
         return await message.answer("Каталог пуст.")
     
+    # Показываем последние 10 товаров для удаления
     for item in catalog["items"][:10]:
         kb = InlineKeyboardBuilder()
         kb.button(text="🗑 Удалить это", callback_data=f"del_confirm_{item['id']}")
@@ -40,15 +42,14 @@ async def process_delete_confirm(callback: types.CallbackQuery):
 async def process_delete_final(callback: types.CallbackQuery):
     item_id = callback.data.replace("del_yes_", "")
     
-    catalog = await read_catalog()
-    original_len = len(catalog["items"])
-    catalog["items"] = [item for item in catalog["items"] if item["id"] != item_id]
-    
-    if len(catalog["items"]) < original_len:
-        if await write_catalog(catalog):
-            await sync_catalog_to_github(catalog)
+    storage_manager = StorageManager()
+    try:
+        # delete_item теперь атомарный: сам делает fresh read, удаляет и сохраняет с проверкой SHA
+        if storage_manager.delete_item(item_id):
             await callback.message.answer(f"✅ Товар {item_id} успешно удален.")
-    else:
-        await callback.message.answer("❌ Товар не найден.")
+        else:
+            await callback.message.answer("❌ Товар не найден (возможно, он уже был удален).")
+    except Exception as e:
+        await callback.message.answer(f"❌ Ошибка при удалении: {e}")
     
     await callback.answer()

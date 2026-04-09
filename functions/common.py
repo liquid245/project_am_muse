@@ -1,56 +1,73 @@
 from aiogram import types, Router, F
 from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile
 from utils.keyboards import get_main_keyboard, get_catalog_inline
-from utils.json_handler import read_catalog
-from config import IMAGES_DIR
+from utils.storage_manager import StorageManager
+from functions.items import send_item_card
+from functions.orders import initiate_order_flow
+from functions.edit import init_item_edit_state, show_edit_menu
+from config import ADMIN_IDS, ADMIN_CHAT_ID, ADMIN_TOPIC_ID
 import os
+import logging
 
 common_router = Router()
 
+class ManagerContact(StatesGroup):
+    waiting_for_message = State()
+
 @common_router.message(Command("start"))
-async def start_command(message: types.Message, command: CommandObject):
+async def start_command(message: types.Message, command: CommandObject, state: FSMContext):
     """Приветствие и выдача меню по роли. Обработка Deep Link."""
     user_id = message.from_user.id
-    args = command.args
-    
+    is_admin = user_id in ADMIN_IDS
+    args = (command.args or "").strip()
+
     if args:
-        catalog = await read_catalog()
-        # Ищем товар по ID (как числу или строке)
-        item = next((i for i in catalog["items"] if str(i["id"]) == args), None)
-        
-        if item:
-            text = (
-                f"🏷 <b>{item['title']}</b>\n\n"
-                f"{item['description']}\n\n"
-                f"💰 Цена: {item['price']} ₽\n"
-                f"📦 В наличии: {item['stock']} шт."
-            )
-            
-            if item["images"]:
-                photo_path = os.path.join(IMAGES_DIR, item["images"][0])
-                if os.path.exists(photo_path):
-                    await message.answer_photo(
-                        photo=FSInputFile(photo_path),
-                        caption=text,
-                        parse_mode="HTML",
-                        reply_markup=get_main_keyboard(user_id)
-                    )
-                else:
-                    await message.answer(
-                        text, 
-                        parse_mode="HTML", 
-                        reply_markup=get_main_keyboard(user_id)
-                    )
-            else:
-                await message.answer(
-                    text, 
-                    parse_mode="HTML", 
-                    reply_markup=get_main_keyboard(user_id)
-                )
-            
-            await message.answer("Хотите заказать этот товар? Напишите менеджеру или используйте меню.")
+        await state.clear()
+        if args.startswith("order_"):
+            deep_link_action = "order"
+            item_arg = args.replace("order_", "", 1)
+        elif args.startswith("edit_"):
+            deep_link_action = "edit"
+            item_arg = args.replace("edit_", "", 1)
+        else:
+            deep_link_action = None
+            item_arg = args
+
+        try:
+            storage_manager = StorageManager()
+            catalog = storage_manager.get_catalog()
+            item = next((i for i in catalog.get("items", []) if str(i["id"]) == item_arg), None)
+
+            if not item:
+                await message.answer("Товар не найден или был удален.")
+                return
+
+            await send_item_card(message, item, is_admin)
+
+            if deep_link_action == "order":
+                success, error_message = await initiate_order_flow(message, state, item_arg)
+                if not success and error_message:
+                    await message.answer(error_message)
+                return
+
+            if deep_link_action == "edit":
+                if not is_admin:
+                    await message.answer("❌ У вас нет прав для редактирования этого товара.")
+                    return
+                item_data, _, _ = await init_item_edit_state(item_arg, state)
+                if not item_data:
+                    await message.answer("Товар не найден или был удален.")
+                    return
+                await show_edit_menu(message, state)
+                return
+
+            return
+        except Exception as e:
+            logging.error(f"Ошибка при обработке Deep Link: {e}")
+            await message.answer("Произошла ошибка при загрузке товара. Попробуйте позже.")
             return
 
     welcome_text = (
@@ -75,6 +92,59 @@ async def open_catalog_text(message: types.Message):
         "Наш сайт-каталог:",
         reply_markup=get_catalog_inline()
     )
+
+@common_router.message(F.text == "✍️ Написать менеджеру")
+async def write_to_manager_reply(message: types.Message, state: FSMContext):
+    await state.set_state(ManagerContact.waiting_for_message)
+    await message.answer("Напишите ваше сообщение менеджеру:")
+
+@common_router.callback_query(F.data.startswith("contact_manager_"))
+async def contact_manager_init(callback: types.CallbackQuery, state: FSMContext):
+    item_id = callback.data.replace("contact_manager_", "")
+    await state.update_data(contact_item_id=item_id)
+    await state.set_state(ManagerContact.waiting_for_message)
+    await callback.message.answer("Напишите ваше сообщение менеджеру по поводу этого товара:")
+    await callback.answer()
+
+@common_router.message(ManagerContact.waiting_for_message)
+async def forward_message_to_manager(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    item_id = data.get("contact_item_id")
+    
+    user_info = (
+        f"📩 <b>Сообщение от {message.from_user.full_name}</b> (ID: <code>{message.from_user.id}</code>):\n"
+    )
+    if item_id:
+        user_info += f"Предмет: {item_id}\n"
+
+    try:
+        # Пересылаем сообщение админу
+        # Если есть ADMIN_CHAT_ID, шлем туда.
+        await message.bot.send_message(
+            chat_id=ADMIN_CHAT_ID,
+            message_thread_id=ADMIN_TOPIC_ID,
+            text=user_info,
+            parse_mode="HTML"
+        )
+        await message.bot.forward_message(
+            chat_id=ADMIN_CHAT_ID,
+            message_thread_id=ADMIN_TOPIC_ID,
+            from_chat_id=message.chat.id,
+            message_id=message.message_id
+        )
+        
+        await message.answer("✅ Ваше сообщение отправлено менеджеру. Мы свяжемся с вами в ближайшее время!")
+    except Exception as e:
+        logging.error(f"Ошибка при пересылке сообщения: {e}")
+        await message.answer("❌ Ошибка при отправке сообщения. Попробуйте позже.")
+    finally:
+        await state.clear()
+
+@common_router.callback_query(F.data == "back_to_main")
+async def back_to_main_handler(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await start_command(callback.message, CommandObject(args=None))
+    await callback.answer()
 
 @common_router.callback_query(F.data == "cancel_action")
 async def cancel_action_handler(callback: types.CallbackQuery, state: FSMContext):

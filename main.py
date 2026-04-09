@@ -8,7 +8,7 @@ from config import BOT_TOKEN
 from functions.common import common_router
 from functions.items import items_router
 from functions.edit import edit_router
-from functions.delete import delete_router
+from functions.orders import orders_router
 
 async def main():
     logging.basicConfig(
@@ -23,11 +23,15 @@ async def main():
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 
+    # Регистрация middleware
+    from utils.media_handler import MediaGroupMiddleware
+    dp.message.middleware(MediaGroupMiddleware())
+
     # Регистрация роутеров
     dp.include_router(common_router)
     dp.include_router(items_router)
     dp.include_router(edit_router)
-    dp.include_router(delete_router)
+    dp.include_router(orders_router)
 
     logging.info("Бот AM Muse (Refactored) запущен.")
     try:
