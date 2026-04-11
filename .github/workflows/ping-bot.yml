@@ -1,0 +1,13 @@
+name: Ping AM Muse bot
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call health check
+        run: curl -fsS https://liquid245-project_am_muse.hf.space/ || exit 1
