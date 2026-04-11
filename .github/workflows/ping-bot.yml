@@ -9,5 +9,20 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Call health check
-        run: curl -fsS https://liquid245-project_am_muse.hf.space/ || exit 1
+      - name: Install hub client
+        run: pip install --quiet huggingface_hub
+
+      - name: Wake Hugging Face space
+        env:
+          HF_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          runtime = api.get_space_runtime("liquid245/project_am_muse")
+          print(f"Space status: {runtime.stage}; hardware: {runtime.hardware}")
+          if runtime.stage == "STOPPED":
+              api.restart_space(repo_id="liquid245/project_am_muse")
+          PY
