@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const button = document.createElement('button');
                 button.className = `bg-dark-navy text-white py-2 px-4 rounded-full hover:bg-peach transition-colors duration-300 w-full`;
 
-                if (item.status === 'sold') {
+                if (item.stock === 0) {
                     button.classList.add('opacity-50', 'cursor-not-allowed');
                     button.disabled = true;
                     button.textContent = `Продано`;
