@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "id": "item_1776609932",
+      "title": "Кулоны «Васильки»",
+      "description": "Кулоны диаметром 1 см",
+      "price": 600,
+      "stock": 3,
+      "created_at": "2026-04-19",
+      "images": [
+        "photo_1776609917589_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1776609917589_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIHC2nk6n1UwrmSZzU98HPcHylB5vOCAALxGGsbyvopSzIEap2R3KKkAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1776606552",
       "title": "Сережки гвоздики «Блестящие»",
       "description": "Серьги гвоздики диаметром 8 мм ссиликоновым наконечником",
