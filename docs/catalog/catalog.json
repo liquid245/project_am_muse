@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "id": "item_1776610769",
+      "title": "Кольца «Конфети»",
+      "description": "Кольца регулируемые, диаметр залитого смолой элемента 8 мм",
+      "price": 600,
+      "stock": 3,
+      "created_at": "2026-04-19",
+      "images": [
+        "photo_1776610717662_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1776610717662_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIHLGnk7Z2hpgGtUKddgTIHCnAqDVOmAAIHGWsbyvopS-2Fwm01mEcVAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1776609932",
       "title": "Кулоны «Васильки»",
       "description": "Кулоны диаметром 1 см",
