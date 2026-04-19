@@ -65,8 +65,7 @@ async def process_address(message: types.Message, state: FSMContext):
                     item_title = item["title"]
                     item_price = item["price"]
                     item["stock"] -= 1
-                    if item["stock"] == 0:
-                        item["status"] = "sold"
+
                     item_in_stock = True
                 break
 

@@ -127,7 +127,7 @@ async def show_catalog(message: types.Message):
     available_items = [
         item
         for item in catalog_data["items"]
-        if item.get("stock", 0) > 0 and item.get("status") == "available"
+        if item.get("stock", 0) > 0
     ]
 
     logging.info(f"Filtered available items: {available_items}")
