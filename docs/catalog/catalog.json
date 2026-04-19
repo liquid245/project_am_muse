@@ -1,6 +1,23 @@
 {
   "items": [
     {
+      "id": "item_1776606552",
+      "title": "Сережки гвоздики «Блестящие»",
+      "description": "Серьги гвоздики диаметром 8 мм ссиликоновым наконечником",
+      "price": 700,
+      "stock": 2,
+      "status": "available",
+      "created_at": "2026-04-19",
+      "images": [
+        "photo_1776606549356_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1776606549356_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIG2Wnk3VWLVThZs2a5Bwc42cEhu-JiAAK7GGsbyvopS2DRQKZPv3PBAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1775757785",
       "title": "Брошь «Звезда»",
       "description": "Брошь из бисера и камней диаметром 7 см.",
