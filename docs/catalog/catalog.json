@@ -8,19 +8,19 @@
       "stock": 3,
       "created_at": "2026-04-19",
       "images": [
-        "photo_1776611845638_0.jpeg",
-        "photo_1776611846442_1.jpeg",
-        "photo_1776611846683_2.jpeg"
+        "photo_1776866126561_0.jpeg",
+        "photo_1776866128135_1.jpeg",
+        "photo_1776866130008_2.jpeg"
       ],
       "image_sources": {
-        "photo_1776611845638_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIHOGnk8gQyThsWkjomurHicWcfK7WzAAIdGWsbyvopS6ClucZ49Lr9AQADAgADeQADOwQ"
+        "photo_1776866126561_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIHU2no003-45Xprye7azh8HMwxjmmkAALFFWsbOr9BS_xYu4MXHCn4AQADAgADeQADOwQ"
         },
-        "photo_1776611846442_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIHOWnk8gRfBfZn8A0kRYIerpC_vckQAAIeGWsbyvopS9lpmwPxGRpgAQADAgADeQADOwQ"
+        "photo_1776866128135_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIHVGno001Cu8K8E7DGwir6RHTziuOLAALGFWsbOr9BS-taMph_j4p3AQADAgADeQADOwQ"
         },
-        "photo_1776611846683_2.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIHOmnk8gSSeoF6o7vdm7B_RaIsLwABkgACHxlrG8r6KUtwt9_lsKp-LQEAAwIAA3kAAzsE"
+        "photo_1776866130008_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIHVWno000DHypJWP9gPwHesZD2Kq3hAALHFWsbOr9BSzDofv5HMqH1AQADAgADeQADOwQ"
         }
       }
     },
