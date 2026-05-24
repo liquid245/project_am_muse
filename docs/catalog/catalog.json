@@ -1,6 +1,38 @@
 {
   "items": [
     {
+      "id": "item_1779660845",
+      "title": "Серьги «Цветочки»",
+      "description": "Серёжки из УФ-смолы в ассортименте с силиконовым наконечником",
+      "price": 1200,
+      "stock": 5,
+      "created_at": "2026-05-24",
+      "images": [
+        "photo_1779660832672_0.jpeg",
+        "photo_1779660833452_1.jpeg",
+        "photo_1779660834198_2.jpeg",
+        "photo_1779660834843_3.jpeg",
+        "photo_1779660835581_4.jpeg"
+      ],
+      "image_sources": {
+        "photo_1779660832672_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIILWoTeB_ccpP1OP9O360RY86WwJmOAALkF2sbUiOhSM5qek9foKQBAQADAgADeQADOwQ"
+        },
+        "photo_1779660833452_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIILmoTeB9BAscHvlbuPiQhvUZKfH4lAALlF2sbUiOhSG3YlzV_ooQOAQADAgADeQADOwQ"
+        },
+        "photo_1779660834198_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIL2oTeB8rC722P3b0_Yns3We1l6mxAALmF2sbUiOhSEZpVuyeUp3QAQADAgADeQADOwQ"
+        },
+        "photo_1779660834843_3.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIMGoTeB97cDzsf5PiWRUtOFIMWzQUAALnF2sbUiOhSHJaSlqKv3guAQADAgADeQADOwQ"
+        },
+        "photo_1779660835581_4.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIMWoTeB8quRm-cXK2mXmZ6-IvHl3OAALoF2sbUiOhSMhVPL7qKyMtAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1779660736",
       "title": "Серьги «Цветочки»",
       "description": "Серёжки из УФ-смолы в ассортименте с силиконовым наконечником",
