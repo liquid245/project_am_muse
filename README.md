@@ -103,7 +103,7 @@ project_am_muse/
 
 ### GitHub Pages
 
-Вы можете просмотреть сайт здесь: https://liquid245.github.io/project_am_muse/
+Вы можете просмотреть сайт здесь: https://am-muse.ru
 
 ---
 
