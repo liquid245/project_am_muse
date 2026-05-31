@@ -112,15 +112,19 @@
       "stock": 1,
       "created_at": "2026-05-31",
       "images": [
-        "photo_1780239824945_0.jpeg",
-        "photo_1780239825624_1.jpeg"
+        "photo_1780242832466_0.jpeg",
+        "photo_1780242833898_1.jpeg",
+        "photo_1780242835617_2.jpeg"
       ],
       "image_sources": {
-        "photo_1780239824945_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIIU2ocTdBuFaJIhb2ctwxNUh3Hwuf-AAJlHGsbtuPhSMEWxhDsAAGXQAEAAwIAA3kAAzsE"
+        "photo_1780242832466_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIw2ocWY8MOQABu7udYt5DGSSujKI5RAAC7hxrG7bj4UirrALn-iXQJwEAAwIAA3kAAzsE"
         },
-        "photo_1780239825624_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIIVGocTdCJB_-DTl2W8JSLgdbeGFCsAAJmHGsbtuPhSG6ZSPfoJaZgAQADAgADeQADOwQ"
+        "photo_1780242833898_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIxGocWY-yPEkUfxRArFbM10Rv01LeAALvHGsbtuPhSB1WWUI283x0AQADAgADeQADOwQ"
+        },
+        "photo_1780242835617_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIxWocWY8g0UAyS0sEKTLxOPcZbNPgAALwHGsbtuPhSK-YOHUep6GxAQADAgADeQADOwQ"
         }
       }
     },
