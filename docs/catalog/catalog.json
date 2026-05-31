@@ -1,6 +1,26 @@
 {
   "items": [
     {
+      "id": "item_1780239934",
+      "title": "Брошь «Морской конёк»",
+      "description": "Брошь из коллекции SEA, выполнена из бисера и стекляруса, размер 7х3,5 см",
+      "price": 4000,
+      "stock": 1,
+      "created_at": "2026-05-31",
+      "images": [
+        "photo_1780239824945_0.jpeg",
+        "photo_1780239825624_1.jpeg"
+      ],
+      "image_sources": {
+        "photo_1780239824945_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIU2ocTdBuFaJIhb2ctwxNUh3Hwuf-AAJlHGsbtuPhSMEWxhDsAAGXQAEAAwIAA3kAAzsE"
+        },
+        "photo_1780239825624_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIIVGocTdCJB_-DTl2W8JSLgdbeGFCsAAJmHGsbtuPhSG6ZSPfoJaZgAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
       "id": "item_1779660845",
       "title": "Серьги «Цветочки»",
       "description": "Серёжки из УФ-смолы в ассортименте с силиконовым наконечником",
