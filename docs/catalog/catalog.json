@@ -102,25 +102,29 @@
     },
     {
       "id": "item_1780240852",
-      "title": "Брошь «Черепашка»",
+      "title": "Броши «Черепашки»",
       "description": "Брошь из коллекции SEA, вышита из бисера и пайеток в бирюзовой гамме, размер 5х4 см",
       "price": 3000,
-      "stock": 1,
+      "stock": 3,
       "created_at": "2026-05-31",
       "images": [
-        "photo_1780240843590_0.jpeg",
-        "photo_1780240844260_1.jpeg",
-        "photo_1780240844945_2.jpeg"
+        "photo_1780329562483_0.jpeg",
+        "photo_1780329564254_1.jpeg",
+        "photo_1780329566347_2.jpeg",
+        "photo_1780329568288_3.jpeg"
       ],
       "image_sources": {
-        "photo_1780240843590_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIIYGocUcof5wzAsFRWP66zD76OJSh0AAJ-HGsbtuPhSC0umZxAsb2RAQADAgADeQADOwQ"
+        "photo_1780329562483_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIJcmodrFmPsjlugyVWcDENcjoUTB8ZAAJ7FmsbtuPxSHqJcY3cuwYFAQADAgADeQADOwQ"
         },
-        "photo_1780240844260_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIIYWocUcpG5Q6J7b6ll8-ju7HcXIVAAAJ_HGsbtuPhSFPMdbguwvzfAQADAgADeAADOwQ"
+        "photo_1780329564254_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIJc2odrFlp-jb6sOtFBb3md0FvyTwEAAJ8FmsbtuPxSNUCR6_AGbBcAQADAgADeQADOwQ"
         },
-        "photo_1780240844945_2.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIIYmocUcoQ9nAlkpQVZOhDYGLssTJrAAKAHGsbtuPhSJdT5KwT8qSJAQADAgADeQADOwQ"
+        "photo_1780329566347_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIJdGodrFm8On4B5yKRv720ZM_okU2tAAJ9FmsbtuPxSM3kXrl3PqeCAQADAgADeAADOwQ"
+        },
+        "photo_1780329568288_3.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIJdWodrFkPs-rKFGW9GO76-fD23nerAAJ-FmsbtuPxSND5iyUnkULoAQADAgADeAADOwQ"
         }
       }
     },
