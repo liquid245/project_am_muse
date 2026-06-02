@@ -1,6 +1,10 @@
 # Environment variables
 .env
 bot/.env
+_bot/.env
+_bot/bot/.env
+_site/.env
+_site/bot/.env
 
 # Python virtual environment
 bot/.venv/
