@@ -103,28 +103,32 @@
     {
       "id": "item_1780240852",
       "title": "Броши «Черепашки»",
-      "description": "Брошь из коллекции SEA, вышита из бисера и пайеток в бирюзовой гамме, размер 5х4 см",
+      "description": "📝 Редактирование товара\n\nНазвание: Броши «Черепашки»\nОписание: Брошь из коллекции SEA, вышита из бисера и пайеток в бирюзовой гамме, размер 3,5-4х4,5-5 см\nЦена: 3000 руб.\nНаличие: 3 шт.\nФотографий: 5\nПозиция в каталоге: 5",
       "price": 3000,
       "stock": 3,
       "created_at": "2026-05-31",
       "images": [
-        "photo_1780329562483_0.jpeg",
-        "photo_1780329564254_1.jpeg",
-        "photo_1780329566347_2.jpeg",
-        "photo_1780329568288_3.jpeg"
+        "photo_1780955373452_0.jpeg",
+        "photo_1780955375197_1.jpeg",
+        "photo_1780955376950_2.jpeg",
+        "photo_1780955378756_3.jpeg",
+        "photo_1780955380573_4.jpeg"
       ],
       "image_sources": {
-        "photo_1780329562483_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIJcmodrFmPsjlugyVWcDENcjoUTB8ZAAJ7FmsbtuPxSHqJcY3cuwYFAQADAgADeQADOwQ"
+        "photo_1780955373452_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIKhWonOOxe8CiPY0UEu6dBeaZ0drQcAAJ_GGsbs604SVsP-_9w5legAQADAgADeQADOwQ"
         },
-        "photo_1780329564254_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIJc2odrFlp-jb6sOtFBb3md0FvyTwEAAJ8FmsbtuPxSNUCR6_AGbBcAQADAgADeQADOwQ"
+        "photo_1780955375197_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIKhmonOOxhJx-L0og936IScBI2CRWtAAKAGGsbs604SW2_mG4q3fZsAQADAgADeQADOwQ"
         },
-        "photo_1780329566347_2.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIJdGodrFm8On4B5yKRv720ZM_okU2tAAJ9FmsbtuPxSM3kXrl3PqeCAQADAgADeAADOwQ"
+        "photo_1780955376950_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIKh2onOOzhLnwJB8UG98xXFdjoiARwAAKBGGsbs604SZScpdLPeXYZAQADAgADeAADOwQ"
         },
-        "photo_1780329568288_3.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIJdWodrFkPs-rKFGW9GO76-fD23nerAAJ-FmsbtuPxSND5iyUnkULoAQADAgADeAADOwQ"
+        "photo_1780955378756_3.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIKiGonOOxzfTHqj7Y4H_EoAAHmud5yeQACghhrG7OtOEmbPdejSOGBlgEAAwIAA3kAAzsE"
+        },
+        "photo_1780955380573_4.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIKiWonOOz0iL_tUb7Ru8cWv8XgSObxAAKDGGsbs604SUEyffAgyWjRAQADAgADeAADOwQ"
         }
       }
     },
