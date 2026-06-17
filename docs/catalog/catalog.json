@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "id": "item_1781725231",
+      "title": "Брошь «Медуза»",
+      "description": "Брошь из коллекции SEA, выполнена из японского бисера и блестящих камней, размер 4,5х7 см",
+      "price": 3800,
+      "stock": 1,
+      "created_at": "2026-06-17",
+      "images": [
+        "photo_1781725012396_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1781725012396_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAILGGoy91R2LuuHsLBWE3YW3yKeuf7dAALfImsbGp6ZSSZSR4eo701xAQADAgADeQADPAQ"
+        }
+      }
+    },
+    {
       "id": "item_1781720056",
       "title": "Брошь «Рыбка»",
       "description": "Брошь из коллекции SEA, выполнена из японского бисера розового и молочного цвета, размер 5,5х5 см",
