@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "id": "item_1781720056",
+      "title": "Брошь «Рыбка»",
+      "description": "Брошь из коллекции SEA, выполнена из японского бисера розового и молочного цвета, размер 5,5х5 см",
+      "price": 3500,
+      "stock": 1,
+      "created_at": "2026-06-17",
+      "images": [
+        "photo_1781720044687_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1781720044687_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAILDGoy4-xUJHGQLKkdZGI2aRnKMSFpAAJrImsbGp6ZSRWmBae2_mtWAQADAgADeAADPAQ"
+        }
+      }
+    },
+    {
       "id": "item_1781719811",
       "title": "Брошь «Ракушка»",
       "description": "Брошь из коллекции SEA, выполнена из японского бисера и жемчуга, размер вышитой части 4х4 см, максимальная длина подвески 5 см",
