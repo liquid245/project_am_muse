@@ -1,22 +1,6 @@
 {
   "items": [
     {
-      "id": "item_1784038766",
-      "title": "123",
-      "description": "123",
-      "price": 123,
-      "stock": 123,
-      "created_at": "2026-07-14",
-      "images": [
-        "photo_1784038763231_0.jpeg"
-      ],
-      "image_sources": {
-        "photo_1784038763231_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAILsmpWRWtNSovOxMZNYZWvKtmpXC_6AAICHGsbZSOwSidI0xf_sCyyAQADAgADdwADPQQ"
-        }
-      }
-    },
-    {
       "id": "item_1781725231",
       "title": "Брошь «Медуза»",
       "description": "Брошь из коллекции SEA, выполнена из японского бисера и блестящих камней, размер 4,5х7 см",
