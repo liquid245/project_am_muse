@@ -1,6 +1,22 @@
 {
   "items": [
     {
+      "id": "item_1784743216",
+      "title": "Брошь «Медуза»",
+      "description": "Брошь из коллекции SEA, вышита из японского бисера белого и мятного цветов",
+      "price": 4700,
+      "stock": 1,
+      "created_at": "2026-07-22",
+      "images": [
+        "photo_1784743200891_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1784743200891_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMCGphBSBErJSpWd4XhsGZRjnbyWrBAAKiG2sb1I4IS13_H6WTI6heAQADAgADeQADPQQ"
+        }
+      }
+    },
+    {
       "id": "item_1784046358",
       "title": "Комплект «Коралл»",
       "description": "Серьги и браслет, выполненные из японского бисера и ювелирного позолоченного сплава. Для сережек имеются силиконовые заглушки. Размер серёжек 6х3,5 см\nРазмер браслета 15х4 см",
