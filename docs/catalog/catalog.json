@@ -1,6 +1,30 @@
 {
   "items": [
     {
+      "id": "item_1785654944",
+      "title": "Броши «Стрекозы»",
+      "description": "Броши из коллекции BOTANICA, сделаны из стразовых цепочек, бусин разного размера и японского бисера.\nРазмер 7,5х6,5 см",
+      "price": 4000,
+      "stock": 3,
+      "created_at": "2026-08-02",
+      "images": [
+        "photo_1785654934035_0.jpeg",
+        "photo_1785654934111_1.jpeg",
+        "photo_1785654934156_2.jpeg"
+      ],
+      "image_sources": {
+        "photo_1785654934035_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMm2pu7pXJ06jpmF94HSKEtRlrOdhzAAIpGmsbXNp4S-rzcm0nQqXvAQADAgADeQADPQQ"
+        },
+        "photo_1785654934111_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMnGpu7pXboi9FnVha7w6OLOz8rlb_AAIqGmsbXNp4SzsLJSFU3RsaAQADAgADeQADPQQ"
+        },
+        "photo_1785654934156_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMnWpu7pU1jBzcahqT3BT7W82N7FeUAAIrGmsbXNp4S_vs5OgQh_kYAQADAgADeQADPQQ"
+        }
+      }
+    },
+    {
       "id": "item_1785652617",
       "title": "Брошь «Морская звезда»",
       "description": "Брошь из коллекции SEA,  вышитая из жемчуга и розовых бусин. \nРазмер 7 см в диаметре",
@@ -305,30 +329,6 @@
         },
         "photo_1780242210826_2.jpeg": {
           "telegram_file_id": "AgACAgIAAxkBAAIIgGocVyDeN9xZYJzh5Mj529Kq-V92AALlHGsbtuPhSNt01nli3DBIAQADAgADeQADOwQ"
-        }
-      }
-    },
-    {
-      "id": "item_1785654944",
-      "title": "Броши «Стрекозы»",
-      "description": "Броши из коллекции BOTANICA, сделаны из стразовых цепочек, бусин разного размера и японского бисера.\nРазмер 7,5х6,5 см",
-      "price": 4000,
-      "stock": 3,
-      "created_at": "2026-08-02",
-      "images": [
-        "photo_1785654934035_0.jpeg",
-        "photo_1785654934111_1.jpeg",
-        "photo_1785654934156_2.jpeg"
-      ],
-      "image_sources": {
-        "photo_1785654934035_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIMm2pu7pXJ06jpmF94HSKEtRlrOdhzAAIpGmsbXNp4S-rzcm0nQqXvAQADAgADeQADPQQ"
-        },
-        "photo_1785654934111_1.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIMnGpu7pXboi9FnVha7w6OLOz8rlb_AAIqGmsbXNp4SzsLJSFU3RsaAQADAgADeQADPQQ"
-        },
-        "photo_1785654934156_2.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIMnWpu7pU1jBzcahqT3BT7W82N7FeUAAIrGmsbXNp4S_vs5OgQh_kYAQADAgADeQADPQQ"
         }
       }
     },
