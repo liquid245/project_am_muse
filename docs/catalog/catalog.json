@@ -25,22 +25,6 @@
       }
     },
     {
-      "id": "item_1785653312",
-      "title": "Брошь «Морская звезда»",
-      "description": "Брошь из коллекции SEA,  вышитая из голубых бусин и серебристого бисера.\nРазмер 6 см в диаметре",
-      "price": 3600,
-      "stock": 1,
-      "created_at": "2026-08-02",
-      "images": [
-        "photo_1785653309759_0.jpeg"
-      ],
-      "image_sources": {
-        "photo_1785653309759_0.jpeg": {
-          "telegram_file_id": "AgACAgIAAxkBAAIMhmpu6D148cjrghMVqjh4L_rUA22kAAL-GWsbXNp4Szt_WWqqnV7KAQADAgADeQADPQQ"
-        }
-      }
-    },
-    {
       "id": "item_1785652617",
       "title": "Брошь «Морская звезда»",
       "description": "Брошь из коллекции SEA,  вышитая из жемчуга и розовых бусин. \nРазмер 7 см в диаметре",
@@ -241,6 +225,22 @@
         },
         "photo_1781024443743_2.jpeg": {
           "telegram_file_id": "AgACAgIAAxkBAAIK7mooRrktwjr1ZDc_haQVq-zw8ecBAAIcK2sb8xxBScm9So_pK-_iAQADAgADeQADOwQ"
+        }
+      }
+    },
+    {
+      "id": "item_1785653312",
+      "title": "Брошь «Морская звезда»",
+      "description": "Брошь из коллекции SEA,  вышитая из голубых бусин и серебристого бисера.\nРазмер 6 см в диаметре",
+      "price": 3600,
+      "stock": 1,
+      "created_at": "2026-08-02",
+      "images": [
+        "photo_1785653309759_0.jpeg"
+      ],
+      "image_sources": {
+        "photo_1785653309759_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMhmpu6D148cjrghMVqjh4L_rUA22kAAL-GWsbXNp4Szt_WWqqnV7KAQADAgADeQADPQQ"
         }
       }
     },
