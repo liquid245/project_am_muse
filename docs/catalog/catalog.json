@@ -1,6 +1,30 @@
 {
   "items": [
     {
+      "id": "item_1785654944",
+      "title": "Брошь «Стрекоза»",
+      "description": "Брошь из коллекции BOTANICA, сделана розовых бусин и золотого бисера. \nРазмер 7,5х6,5 см",
+      "price": 4000,
+      "stock": 3,
+      "created_at": "2026-08-02",
+      "images": [
+        "photo_1785654934035_0.jpeg",
+        "photo_1785654934111_1.jpeg",
+        "photo_1785654934156_2.jpeg"
+      ],
+      "image_sources": {
+        "photo_1785654934035_0.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMm2pu7pXJ06jpmF94HSKEtRlrOdhzAAIpGmsbXNp4S-rzcm0nQqXvAQADAgADeQADPQQ"
+        },
+        "photo_1785654934111_1.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMnGpu7pXboi9FnVha7w6OLOz8rlb_AAIqGmsbXNp4SzsLJSFU3RsaAQADAgADeQADPQQ"
+        },
+        "photo_1785654934156_2.jpeg": {
+          "telegram_file_id": "AgACAgIAAxkBAAIMnWpu7pU1jBzcahqT3BT7W82N7FeUAAIrGmsbXNp4S_vs5OgQh_kYAQADAgADeQADPQQ"
+        }
+      }
+    },
+    {
       "id": "item_1785653312",
       "title": "Брошь «Морская звезда»",
       "description": "Брошь из коллекции SEA,  вышитая из голубых бусин и серебристого бисера.\nРазмер 6 см в диаметре",
